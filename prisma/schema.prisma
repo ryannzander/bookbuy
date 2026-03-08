@@ -23,7 +23,6 @@ model User {
   responseRate Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  role         UserRole @default(USER)
   onboarded    Boolean  @default(false)
   lastActiveAt DateTime?
 
