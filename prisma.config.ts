@@ -11,6 +11,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    // Use direct connection for CLI (avoids pooler "prepared statement already exists" errors)
+    url: process.env.DIRECT_DATABASE_URL ?? env("DATABASE_URL"),
   },
 });
