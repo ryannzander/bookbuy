@@ -34,8 +34,8 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-sm py-8 dashboard-theme">
-      <Card className="shadow-md">
+    <div className="dashboard-theme min-h-screen bg-background px-4 py-10">
+      <Card className="mx-auto max-w-sm shadow-md">
         <CardHeader>
           <CardTitle>Log in</CardTitle>
           <CardDescription>Sign in to your BookBuy account</CardDescription>
@@ -84,7 +84,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-sm p-8 text-muted-foreground">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div className="dashboard-theme min-h-screen bg-background p-8 text-muted-foreground">
+          Loading…
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

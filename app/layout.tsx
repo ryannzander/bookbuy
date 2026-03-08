@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { AppShell } from "@/components/app-shell";
@@ -30,6 +31,7 @@ export default function RootLayout({
         <TRPCProvider>
           <AppShell>{children}</AppShell>
         </TRPCProvider>
+        <Analytics />
       </body>
     </html>
   );
