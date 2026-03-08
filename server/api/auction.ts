@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
-import { ListingStatus, ListingType } from "@prisma/client";
+import { ListingStatus, ListingType, PurchaseStatus } from "@prisma/client";
 import { createNotification } from "@/server/api/notifications";
 
 export async function resolveAuctionIfEnded(db: PrismaClient, listingId: string) {
@@ -25,6 +25,8 @@ export async function resolveAuctionIfEnded(db: PrismaClient, listingId: string)
       data: {
         listingId: listing.id,
         buyerId: winningBid.userId,
+        sellerId: listing.sellerId,
+        status: PurchaseStatus.PENDING,
         finalPrice: winningBid.amount,
       },
     }),

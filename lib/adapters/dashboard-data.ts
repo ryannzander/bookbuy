@@ -34,26 +34,31 @@ function toListing(input: {
   condition: string;
   price: { toString(): string } | number;
   status: "AVAILABLE" | "SOLD" | "AUCTION_ENDED";
+  courseCode: string | null;
+  description: string | null;
+  edition: string | null;
   imageUrls: string | null;
   createdAt: Date;
   type: "FIXED" | "AUCTION";
+  isFeatured: boolean;
+  viewCount: number;
 }): Listing {
   return {
     id: input.id,
     sellerId: input.sellerId,
     title: input.title,
-    courseCode: toCourseCode(input.isbn),
+    courseCode: input.courseCode ?? toCourseCode(input.isbn),
     subject: input.subject,
     price: Number(input.price),
     condition: input.condition,
-    description: null,
+    description: input.description,
     status: input.status,
-    edition: null,
+    edition: input.edition,
     author: input.author,
     imageUrls: parseImageUrls(input.imageUrls),
     createdAt: input.createdAt.toISOString(),
-    isFeatured: false,
-    viewCount: 0,
+    isFeatured: input.isFeatured,
+    viewCount: input.viewCount,
     type: input.type,
   };
 }
@@ -84,13 +89,15 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
     const me = await caller.auth.me();
     if (!me) return { status: "unauthenticated" };
 
-    const [listingsRaw, purchasesRaw, unreadCount, notificationsRaw, sellerSummary] =
+    const [listingsRaw, purchasesRaw, salesRaw, notificationsRaw, sellerSummary, analytics, meetupsRaw] =
       await Promise.all([
         caller.listing.getMyListings(),
         caller.purchase.myPurchases(),
-        caller.notification.unreadCount(),
+        caller.purchase.mySales(),
         caller.notification.getMine({ limit: 10 }),
         caller.seller.getByUserId({ userId: me.id }).catch(() => null),
+        caller.analytics.dashboardSummary(),
+        caller.meetup.upcoming(),
       ]);
 
     const recentListings = listingsRaw.map(toListing);
@@ -101,13 +108,34 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       listingTitle: p.listing.title,
       buyerId: p.buyerId,
       sellerId: p.listing.sellerId,
-      status: "COMPLETED",
+      status: p.status,
       priceAtPurchase: Number(p.finalPrice),
       createdAt: p.purchasedAt.toISOString(),
-      meetupDate: null,
+      meetupDate: p.meetupDate ? p.meetupDate.toISOString() : null,
     }));
 
-    const upcomingMeetups: Meetup[] = [];
+    const salesOrders: Order[] = salesRaw.map((p) => ({
+      id: p.id,
+      listingId: p.listingId,
+      listingTitle: p.listing.title,
+      buyerId: p.buyerId,
+      sellerId: p.sellerId,
+      status: p.status,
+      priceAtPurchase: Number(p.finalPrice),
+      createdAt: p.purchasedAt.toISOString(),
+      meetupDate: p.meetupDate ? p.meetupDate.toISOString() : null,
+    }));
+
+    const upcomingMeetups: Meetup[] = meetupsRaw.map((m) => ({
+      id: m.id,
+      orderId: m.purchaseId,
+      buyerName: m.purchase.buyer.name ?? "Buyer",
+      listingTitle: m.purchase.listing.title,
+      startTime: m.startTime.toISOString(),
+      endTime: m.endTime ? m.endTime.toISOString() : null,
+      location: m.location ?? null,
+      status: m.status,
+    }));
 
     const notifications: Notification[] = notificationsRaw.items.map((n) => ({
       id: n.id,
@@ -129,8 +157,8 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
         username: (me.name ?? me.email.split("@")[0]).toLowerCase().replace(/\s+/g, ""),
         email: me.email,
         avatarUrl: me.avatarUrl ?? null,
-        schoolName: null,
-        verified: true,
+        schoolName: me.schoolName ?? null,
+        verified: me.verified,
         createdAt: me.createdAt.toISOString(),
       },
       sellerProfile: {
@@ -140,18 +168,20 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
         avatarUrl: me.avatarUrl ?? null,
         averageRating,
         reviewCount,
-        totalSales: recentOrders.length,
+        totalSales: analytics.booksSold,
         joinedAt: me.createdAt.toISOString(),
       },
       stats: {
-        activeListings: recentListings.filter((l) => l.status === "AVAILABLE").length,
-        booksSold: recentOrders.length,
-        averageRating,
-        pendingOrders: 0,
-        unreadMessages: unreadCount,
+        activeListings: analytics.activeListings,
+        booksSold: analytics.booksSold,
+        averageRating: analytics.averageRating,
+        pendingOrders: analytics.pendingOrders,
+        unreadMessages: analytics.unreadMessages,
       },
       recentListings: recentListings.slice(0, 6),
-      recentOrders: recentOrders.slice(0, 6),
+      recentOrders: [...salesOrders, ...recentOrders]
+        .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+        .slice(0, 6),
       upcomingMeetups,
       notifications,
       activitySeries: buildActivitySeries(recentListings, recentOrders),

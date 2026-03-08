@@ -48,7 +48,9 @@ export function DashboardHeader({
           <p className="text-sm font-semibold text-foreground">
             {user.name ?? "User"}
           </p>
-          <p className="text-xs text-muted-foreground">Student Seller</p>
+          <p className="text-xs text-muted-foreground">
+            {user.verified ? "Verified Student Seller" : "Student Seller"}
+          </p>
         </div>
       </div>
     </header>

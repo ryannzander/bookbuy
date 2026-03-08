@@ -45,6 +45,12 @@ export default function ListingDetailPage() {
       setBidAmount("");
     },
   });
+  const createThread = api.message.createThread.useMutation({
+    onSuccess: (thread) => {
+      router.push(`/messages?thread=${thread.id}`);
+    },
+  });
+  const reportMutation = api.report.create.useMutation();
 
   if (isLoading || !listing) {
     return (
@@ -92,12 +98,41 @@ export default function ListingDetailPage() {
             <Link href={`/sellers/${listing.seller.id}`} className="text-sm text-primary hover:underline">
               {listing.seller.name ?? "Seller"}
             </Link>
+            {!isOwner && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => createThread.mutate({ otherUserId: listing.seller.id, listingId: listing.id })}
+                disabled={createThread.isPending}
+              >
+                Message seller
+              </Button>
+            )}
             {isOwner && isAvailable && (
               <Link href={`/listings/${id}/edit`}>
                 <Button variant="outline" size="sm">Edit listing</Button>
               </Link>
             )}
+            {!isOwner && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  reportMutation.mutate({
+                    targetUserId: listing.seller.id,
+                    listingId: listing.id,
+                    reason: "Suspicious listing",
+                  })
+                }
+                disabled={reportMutation.isPending}
+              >
+                Report
+              </Button>
+            )}
           </div>
+          {reportMutation.isSuccess && (
+            <p className="text-xs text-muted-foreground">Report submitted.</p>
+          )}
 
           {isAvailable && isAuction && !hasEnded && (
             <div className="rounded-lg border p-4 space-y-2">

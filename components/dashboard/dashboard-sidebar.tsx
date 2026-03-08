@@ -10,6 +10,7 @@ import {
   Gavel,
   Bell,
   ArrowRightLeft,
+  Flag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,8 @@ const navItems = [
   { href: "/", label: "Marketplace", icon: BookOpen },
   { href: "/dashboard/listings", label: "My Listings", icon: List },
   { href: "/dashboard/orders", label: "Orders", icon: ArrowRightLeft },
-  { href: "/notifications", label: "Messages", icon: MessageSquare },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/dashboard/reports", label: "Reports", icon: Flag },
   { href: "/", label: "Auctions", icon: Gavel },
 ] as const;
 

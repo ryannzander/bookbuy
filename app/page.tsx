@@ -19,6 +19,7 @@ const SORT_OPTIONS = [
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const [subject, setSubject] = useState(searchParams.get("subject") ?? "");
+  const [courseCode, setCourseCode] = useState(searchParams.get("courseCode") ?? "");
   const [condition, setCondition] = useState(searchParams.get("condition") ?? "");
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
@@ -26,19 +27,24 @@ function MarketplaceContent() {
     (searchParams.get("type") as "FIXED" | "AUCTION") ?? ""
   );
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [availability, setAvailability] = useState<"available" | "sold" | "all">(
+    (searchParams.get("availability") as "available" | "sold" | "all") ?? "available"
+  );
   const [sort, setSort] = useState<"newest" | "priceAsc" | "priceDesc">(
     (searchParams.get("sort") as "newest" | "priceAsc" | "priceDesc") ?? "newest"
   );
 
   const filters = useMemo(() => ({
     subject: subject || undefined,
+    courseCode: courseCode || undefined,
     condition: condition || undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     type: type || undefined,
     search: search.trim() || undefined,
+    availability,
     sort,
-  }), [subject, condition, minPrice, maxPrice, type, search, sort]);
+  }), [subject, courseCode, condition, minPrice, maxPrice, type, search, availability, sort]);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.listing.getMany.useInfiniteQuery(
@@ -49,14 +55,16 @@ function MarketplaceContent() {
   const updateUrl = useCallback(() => {
     const params = new URLSearchParams();
     if (subject) params.set("subject", subject);
+    if (courseCode) params.set("courseCode", courseCode);
     if (condition) params.set("condition", condition);
     if (minPrice) params.set("minPrice", minPrice);
     if (maxPrice) params.set("maxPrice", maxPrice);
     if (type) params.set("type", type);
     if (search.trim()) params.set("search", search.trim());
+    if (availability !== "available") params.set("availability", availability);
     if (sort !== "newest") params.set("sort", sort);
     window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params}` : ""}`);
-  }, [subject, condition, minPrice, maxPrice, type, search, sort]);
+  }, [subject, courseCode, condition, minPrice, maxPrice, type, search, availability, sort]);
 
   const applyFilters = () => updateUrl();
 
@@ -94,6 +102,15 @@ function MarketplaceContent() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="courseCode">Course code</Label>
+              <Input
+                id="courseCode"
+                placeholder="MATH 221"
+                value={courseCode}
+                onChange={(e) => setCourseCode(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="condition">Condition</Label>
               <select
                 id="condition"
@@ -117,6 +134,18 @@ function MarketplaceContent() {
                 <option value="">Any</option>
                 <option value="FIXED">Buy now</option>
                 <option value="AUCTION">Auction</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Availability</Label>
+              <select
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                value={availability}
+                onChange={(e) => setAvailability(e.target.value as "available" | "sold" | "all")}
+              >
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+                <option value="all">All</option>
               </select>
             </div>
             <div className="space-y-2">

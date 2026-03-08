@@ -91,6 +91,9 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Use your school email (.edu) to get a verified seller badge.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

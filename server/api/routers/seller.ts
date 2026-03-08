@@ -9,7 +9,7 @@ export const sellerRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
-        select: { id: true, name: true, avatarUrl: true, createdAt: true },
+        select: { id: true, name: true, avatarUrl: true, createdAt: true, verified: true, schoolName: true },
       });
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
       const [listings, reviewsReceived] = await Promise.all([

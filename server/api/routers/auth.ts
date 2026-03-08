@@ -12,11 +12,14 @@ export const authRouter = createTRPCRouter({
           email: input.email,
           name: input.name ?? null,
           avatarUrl: input.avatarUrl ?? null,
+          username: input.email.split("@")[0],
+          verified: input.email.endsWith(".edu"),
         },
         update: {
           email: input.email,
           name: input.name ?? undefined,
           avatarUrl: input.avatarUrl ?? undefined,
+          verified: input.email.endsWith(".edu"),
         },
       });
       return { ok: true };
@@ -27,4 +30,21 @@ export const authRouter = createTRPCRouter({
       where: { id: ctx.userId },
     });
   }),
+
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        username: z.string().min(3).max(30),
+        schoolName: z.string().min(2).max(80).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.user.update({
+        where: { id: ctx.userId },
+        data: {
+          username: input.username.toLowerCase(),
+          schoolName: input.schoolName ?? null,
+        },
+      });
+    }),
 });
