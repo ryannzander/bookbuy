@@ -1,92 +1,96 @@
-"use client";
-
 import Link from "next/link";
-import { api } from "@/lib/trpc/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getDashboardData } from "@/lib/adapters/dashboard-data";
+import { StatsCards } from "@/components/dashboard/stats-cards";
+import { StatsChart } from "@/components/dashboard/stats-chart";
+import { ListingsGrid } from "@/components/dashboard/listings-grid";
+import { CalendarWidget } from "@/components/dashboard/calendar-widget";
+import { ActivityWidget } from "@/components/dashboard/activity-widget";
+import { ErrorState } from "@/components/shared/error-state";
+import { EmptyState } from "@/components/shared/empty-state";
 
-export default function DashboardPage() {
-  const { data: listings, isLoading: listingsLoading } = api.listing.getMyListings.useQuery();
-  const { data: purchases, isLoading: purchasesLoading } = api.purchase.myPurchases.useQuery();
+export default async function DashboardPage() {
+  const result = await getDashboardData();
+
+  if (result.status === "unauthenticated") {
+    return (
+      <ErrorState
+        title="You are signed out"
+        description="Please sign in to access your dashboard."
+      />
+    );
+  }
+
+  if (result.status === "error") {
+    return <ErrorState title="Could not load dashboard" description={result.message} />;
+  }
+
+  const { data } = result;
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="space-y-8">
+        <div>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+            Welcome back, {data.user.name ?? data.user.email}. Here is your marketplace pulse.
+          </p>
+        </div>
 
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">My listings</h2>
-        {listingsLoading ? (
-          <p className="text-muted-foreground">Loading…</p>
-        ) : !listings?.length ? (
-          <p className="text-muted-foreground">You haven&apos;t listed any books yet.</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((listing) => (
-              <Card key={listing.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <Link href={`/listings/${listing.id}`} className="font-medium hover:underline">
-                      {listing.title}
-                    </Link>
-                    <span className="text-xs text-muted-foreground">{listing.status}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{listing.author} · ${Number(listing.price)}</p>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  {listing.status === "AVAILABLE" && (
-                    <Link href={`/listings/${listing.id}/edit`}>
-                      <Button variant="outline" size="sm">Edit</Button>
-                    </Link>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+        <StatsCards stats={data.stats} />
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-foreground">Your live listings</h2>
+            <Link
+              href="/listings/new"
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-colors"
+            >
+              List a Book
+            </Link>
           </div>
-        )}
-        <Link href="/listings/new" className="mt-4 inline-block">
-          <Button>List a textbook</Button>
-        </Link>
-      </section>
+          <ListingsGrid
+            listings={data.recentListings}
+            emptyTitle="No listings yet"
+            emptyDescription="Create your first textbook listing and start reaching students."
+          />
+        </section>
 
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">My purchases</h2>
-        {purchasesLoading ? (
-          <p className="text-muted-foreground">Loading…</p>
-        ) : !purchases?.length ? (
-          <p className="text-muted-foreground">No purchases yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {purchases.map((p) => (
-              <Card key={p.id}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{p.listing.title}</CardTitle>
-                  <CardDescription>
-                    ${Number(p.finalPrice)} · Purchased {new Date(p.purchasedAt).toLocaleDateString()}
-                    {p.listing.seller && ` · Seller: ${p.listing.seller.name ?? "Unknown"}`}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Arrange in-person payment with the seller.
-                  </p>
-                  {!p.review && (
-                    <Link href={`/dashboard/review/${p.id}`}>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        Leave a review
-                      </Button>
-                    </Link>
-                  )}
-                  {p.review && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      You left a {p.review.rating}-star review.
+        <StatsChart data={data.activitySeries} />
+
+        <section>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Recent exchanges</h2>
+          {data.recentOrders.length === 0 ? (
+            <EmptyState
+              title="No exchanges yet"
+              description="Once purchases are completed, exchange history appears here."
+            />
+          ) : (
+            <div className="space-y-3">
+              {data.recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="rounded-2xl bg-card border border-border p-4 flex items-center justify-between"
+                >
+                  <div>
+                    <p className="font-medium text-foreground">{order.listingTitle ?? order.listingId}</p>
+                    <p className="text-sm text-muted-foreground">
+                      ${order.priceAtPurchase} · {new Date(order.createdAt).toLocaleDateString()}
                     </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
+                  </div>
+                  <span className="rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground">
+                    {order.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      <aside className="space-y-6">
+        <CalendarWidget />
+        <ActivityWidget meetups={data.upcomingMeetups} />
+      </aside>
     </div>
   );
 }

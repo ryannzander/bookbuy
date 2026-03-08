@@ -21,13 +21,13 @@ export function Navbar() {
   });
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-14 items-center justify-between">
-        <Link href="/" className="font-semibold">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6 flex h-14 items-center justify-between">
+        <Link href="/" className="text-lg font-bold tracking-tight text-foreground hover:opacity-90 transition-opacity">
           BookBuy
         </Link>
-        <nav className="flex items-center gap-4">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+        <nav className="flex items-center gap-6">
+          <Link href="/marketplace" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
           </Link>
           {isLoggedIn ? (
@@ -37,7 +37,7 @@ export function Navbar() {
                   Sell
                 </Button>
               </Link>
-              <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
+              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Dashboard
               </Link>
               <DropdownMenu>

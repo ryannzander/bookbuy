@@ -1,19 +1,23 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { ListingType, ListingStatus } from "@prisma/client";
+import { ListingType, ListingStatus, type Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "@/server/api/trpc";
 import { resolveAuctionIfEnded } from "@/server/api/auction";
 
 const listingCreateInput = z.object({
   title: z.string().min(1),
+  courseCode: z.string().optional(),
   author: z.string().min(1),
   isbn: z.string().min(1),
   condition: z.string().min(1),
   subject: z.string().min(1),
+  description: z.string().optional(),
+  edition: z.string().optional(),
   price: z.number().positive(),
   type: z.enum(["FIXED", "AUCTION"]),
   auctionEndsAt: z.coerce.date().optional(),
   imageUrls: z.string().optional(),
+  isFeatured: z.boolean().optional(),
 });
 
 export const listingRouter = createTRPCRouter({
@@ -24,7 +28,14 @@ export const listingRouter = createTRPCRouter({
       const listing = await ctx.db.listing.findUnique({
         where: { id: input.id },
         include: {
-          seller: { select: { id: true, name: true, avatarUrl: true } },
+          seller: {
+            select: {
+              id: true,
+              name: true,
+              avatarUrl: true,
+              reviewsReceived: { select: { rating: true } },
+            },
+          },
           bids: { orderBy: { amount: "desc" }, include: { user: { select: { id: true, name: true } } } },
         },
       });
@@ -36,25 +47,28 @@ export const listingRouter = createTRPCRouter({
       cursor: z.string().optional(),
       limit: z.number().min(1).max(50).default(20),
       subject: z.string().optional(),
+      courseCode: z.string().optional(),
       condition: z.string().optional(),
       minPrice: z.number().optional(),
       maxPrice: z.number().optional(),
       type: z.enum(["FIXED", "AUCTION"]).optional(),
+      availability: z.enum(["available", "sold", "all"]).optional(),
       search: z.string().optional(),
       sort: z.enum(["newest", "priceAsc", "priceDesc"]).default("newest"),
     }))
     .query(async ({ ctx, input }) => {
-      const where: {
-        status: ListingStatus;
-        subject?: string;
-        condition?: string;
-        type?: ListingType;
-        price?: { gte?: number; lte?: number };
-        OR?: Array<{ title?: { contains: string; mode: "insensitive" }; author?: { contains: string; mode: "insensitive" }; isbn?: { contains: string; mode: "insensitive" } }>;
-      } = {
+      const where: Prisma.ListingWhereInput = {
         status: ListingStatus.AVAILABLE,
       };
+      if (input.availability === "sold") {
+        where.status = ListingStatus.SOLD;
+      } else if (input.availability === "all") {
+        delete where.status;
+      }
       if (input.subject) where.subject = input.subject;
+      if (input.courseCode) {
+        where.courseCode = { contains: input.courseCode, mode: "insensitive" };
+      }
       if (input.condition) where.condition = input.condition;
       if (input.type) where.type = input.type as ListingType;
       if (input.minPrice != null || input.maxPrice != null) {
@@ -67,6 +81,7 @@ export const listingRouter = createTRPCRouter({
           { title: { contains: input.search, mode: "insensitive" } },
           { author: { contains: input.search, mode: "insensitive" } },
           { isbn: { contains: input.search, mode: "insensitive" } },
+          { courseCode: { contains: input.search, mode: "insensitive" } },
         ];
       }
       const orderBy =
@@ -81,7 +96,13 @@ export const listingRouter = createTRPCRouter({
         where,
         orderBy,
         include: {
-          seller: { select: { id: true, name: true } },
+          seller: {
+            select: {
+              id: true,
+              name: true,
+              reviewsReceived: { select: { rating: true } },
+            },
+          },
           bids: { orderBy: { amount: "desc" }, take: 1 },
         },
       });
@@ -103,6 +124,16 @@ export const listingRouter = createTRPCRouter({
   create: protectedProcedure
     .input(listingCreateInput)
     .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.userId },
+        select: { verified: true, email: true },
+      });
+      if (!user || (!user.verified && !user.email.endsWith(".utschools.ca"))) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "A .utschools.ca account is required to create listings",
+        });
+      }
       if (input.type === "AUCTION" && !input.auctionEndsAt) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Auction must have auctionEndsAt" });
       }
@@ -111,13 +142,17 @@ export const listingRouter = createTRPCRouter({
           sellerId: ctx.userId,
           title: input.title,
           author: input.author,
+          courseCode: input.courseCode ?? null,
           isbn: input.isbn,
           condition: input.condition,
           subject: input.subject,
+          description: input.description ?? null,
+          edition: input.edition ?? null,
           price: input.price,
           type: input.type as ListingType,
           auctionEndsAt: input.auctionEndsAt ?? null,
           imageUrls: input.imageUrls ?? null,
+          isFeatured: input.isFeatured ?? false,
         },
       });
     }),

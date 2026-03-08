@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { ListingStatus, ListingType } from "@prisma/client";
+import { ListingStatus, ListingType, PurchaseStatus } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
 
@@ -27,6 +27,8 @@ export const purchaseRouter = createTRPCRouter({
           data: {
             listingId: listing.id,
             buyerId: ctx.userId,
+            sellerId: listing.sellerId,
+            status: PurchaseStatus.PENDING,
             finalPrice: listing.price,
           },
         }),
@@ -58,6 +60,19 @@ export const purchaseRouter = createTRPCRouter({
       include: {
         listing: { include: { seller: { select: { id: true, name: true } } } },
         review: true,
+        meetup: true,
+      },
+      orderBy: { purchasedAt: "desc" },
+    });
+  }),
+
+  mySales: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.purchase.findMany({
+      where: { sellerId: ctx.userId },
+      include: {
+        listing: true,
+        buyer: { select: { id: true, name: true, email: true } },
+        meetup: true,
       },
       orderBy: { purchasedAt: "desc" },
     });

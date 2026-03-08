@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -25,11 +27,12 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
-    "@prisma/client": "^6.0.0",
     "next": "16.1.6",
+    "pg": "^8.13.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.53.0",
+    "recharts": "^3.8.0",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.5.2",
     "zod": "^3.23.8"
@@ -40,13 +43,14 @@
     "@trpc/server": "^11.0.0-rc.600"
   },
   "devDependencies": {
-    "prisma": "^6.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "prisma": "^7.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

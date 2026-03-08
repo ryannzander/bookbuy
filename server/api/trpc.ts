@@ -12,13 +12,19 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       create: {
         id: supabaseUser.id,
         email: supabaseUser.email ?? "",
+                  username: (supabaseUser.email ?? "").split("@")[0] || null,
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? null,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? null,
+                  schoolName: supabaseUser.user_metadata?.school_name ?? null,
+                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
       },
       update: {
         email: supabaseUser.email ?? undefined,
+                  username: (supabaseUser.email ?? "").split("@")[0] || undefined,
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? undefined,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? undefined,
+                  schoolName: supabaseUser.user_metadata?.school_name ?? undefined,
+                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
       },
     });
   }

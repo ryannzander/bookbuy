@@ -45,6 +45,12 @@ export default function ListingDetailPage() {
       setBidAmount("");
     },
   });
+  const createThread = api.message.createThread.useMutation({
+    onSuccess: (thread) => {
+      router.push(`/messages?thread=${thread.id}`);
+    },
+  });
+  const reportMutation = api.report.create.useMutation();
 
   if (isLoading || !listing) {
     return (
@@ -60,16 +66,24 @@ export default function ListingDetailPage() {
   const minBid = highBid ? Number(highBid.amount) + 0.01 : Number(listing.price);
   const endsAtLabel = formatEndsAt(listing.auctionEndsAt);
   const hasEnded = listing.auctionEndsAt && new Date(listing.auctionEndsAt) <= new Date();
+  const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
+  const sellerAvgRating =
+    sellerReviewCount > 0
+      ? listing.seller.reviewsReceived.reduce((sum, review) => sum + review.rating, 0) /
+        sellerReviewCount
+      : null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Card>
-        <CardHeader>
-          <div className="flex justify-between gap-2 text-sm text-muted-foreground">
-            <span>{listing.type}</span>
-            {listing.subject} · {listing.condition}
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex rounded-lg px-2.5 py-1 text-xs font-medium bg-primary/20 text-primary">
+              {listing.type}
+            </span>
+            <span className="text-sm text-muted-foreground">{listing.subject} · {listing.condition}</span>
           </div>
-          <h1 className="text-2xl font-bold">{listing.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{listing.title}</h1>
           <p className="text-muted-foreground">{listing.author}</p>
           {listing.isbn && <p className="text-sm text-muted-foreground">ISBN: {listing.isbn}</p>}
         </CardHeader>
@@ -90,12 +104,46 @@ export default function ListingDetailPage() {
             <Link href={`/sellers/${listing.seller.id}`} className="text-sm text-primary hover:underline">
               {listing.seller.name ?? "Seller"}
             </Link>
+            <span className="text-xs text-muted-foreground">
+              {sellerAvgRating != null
+                ? `${sellerAvgRating.toFixed(1)} / 5 (${sellerReviewCount} reviews)`
+                : "No reviews yet"}
+            </span>
+            {!isOwner && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => createThread.mutate({ otherUserId: listing.seller.id, listingId: listing.id })}
+                disabled={createThread.isPending}
+              >
+                Message seller
+              </Button>
+            )}
             {isOwner && isAvailable && (
               <Link href={`/listings/${id}/edit`}>
                 <Button variant="outline" size="sm">Edit listing</Button>
               </Link>
             )}
+            {!isOwner && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  reportMutation.mutate({
+                    targetUserId: listing.seller.id,
+                    listingId: listing.id,
+                    reason: "Suspicious listing",
+                  })
+                }
+                disabled={reportMutation.isPending}
+              >
+                Report
+              </Button>
+            )}
           </div>
+          {reportMutation.isSuccess && (
+            <p className="text-xs text-muted-foreground">Report submitted.</p>
+          )}
 
           {isAvailable && isAuction && !hasEnded && (
             <div className="rounded-lg border p-4 space-y-2">

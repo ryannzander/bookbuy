@@ -14,10 +14,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const schema = z.object({
   title: z.string().min(1, "Title required"),
+  courseCode: z.string().optional(),
   author: z.string().min(1, "Author required"),
   isbn: z.string().min(1, "ISBN required"),
   condition: z.string().min(1, "Condition required"),
   subject: z.string().min(1, "Subject required"),
+  edition: z.string().optional(),
+  description: z.string().optional(),
   price: z.coerce.number().positive("Price must be positive"),
   type: z.enum(["FIXED", "AUCTION"]),
   auctionEndsAt: z.string().optional(),
@@ -39,10 +42,13 @@ export default function EditListingPage() {
     resolver: zodResolver(schema),
     defaultValues: {
       title: "",
+      courseCode: "",
       author: "",
       isbn: "",
       condition: "",
       subject: "",
+      edition: "",
+      description: "",
       price: 0,
       type: "FIXED",
     },
@@ -57,10 +63,13 @@ export default function EditListingPage() {
     setType(listing.type as "FIXED" | "AUCTION");
     form.reset({
       title: listing.title,
+      courseCode: listing.courseCode ?? "",
       author: listing.author,
       isbn: listing.isbn,
       condition: listing.condition,
       subject: listing.subject,
+      edition: listing.edition ?? "",
+      description: listing.description ?? "",
       price: Number(listing.price),
       type: listing.type as "FIXED" | "AUCTION",
       auctionEndsAt: listing.auctionEndsAt
@@ -119,6 +128,10 @@ export default function EditListingPage() {
               )}
             </div>
             <div className="space-y-2">
+              <Label htmlFor="courseCode">Course code (optional)</Label>
+              <Input id="courseCode" {...form.register("courseCode")} />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="isbn">ISBN</Label>
               <Input id="isbn" {...form.register("isbn")} />
               {form.formState.errors.isbn && (
@@ -138,6 +151,19 @@ export default function EditListingPage() {
               {form.formState.errors.subject && (
                 <p className="text-sm text-destructive">{form.formState.errors.subject.message}</p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edition">Edition (optional)</Label>
+              <Input id="edition" {...form.register("edition")} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description (optional)</Label>
+              <textarea
+                id="description"
+                {...form.register("description")}
+                rows={3}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">Price ($)</Label>

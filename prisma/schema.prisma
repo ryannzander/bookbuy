@@ -4,44 +4,74 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id
-  email     String
-  name      String?
-  avatarUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id
+  email        String   @unique
+  username     String?  @unique
+  name         String?
+  avatarUrl    String?
+  schoolName   String?
+  verified     Boolean  @default(false)
+  responseRate Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  listings     Listing[]
-  purchases    Purchase[]     @relation("Buyer")
-  reviewsGiven Review[]      @relation("ReviewAuthor")
-  reviewsReceived Review[]   @relation("ReviewReceiver")
-  bids         Bid[]
-  notifications Notification[]
+  sellerProfile    SellerProfile?
+  listings         Listing[]
+  purchases        Purchase[]       @relation("Buyer")
+  sales            Purchase[]       @relation("Seller")
+  reviewsGiven     Review[]         @relation("ReviewAuthor")
+  reviewsReceived  Review[]         @relation("ReviewReceiver")
+  bids             Bid[]
+  notifications    Notification[]
+  messageThreadsAsA MessageThread[] @relation("ThreadUserA")
+  messageThreadsAsB MessageThread[] @relation("ThreadUserB")
+  messages         Message[]
+  reportsFiled     Report[]         @relation("ReportReporter")
+  reportsReceived  Report[]         @relation("ReportTarget")
 }
 
 model Listing {
-  id            String   @id @default(cuid())
+  id            String        @id @default(cuid())
   sellerId      String
-  seller        User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  seller        User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   title         String
+  courseCode    String?
   author        String
   isbn          String
   condition     String
   subject       String
-  price         Decimal  @db.Decimal(10, 2)
+  description   String?
+  edition       String?
+  price         Decimal       @db.Decimal(10, 2)
   type          ListingType
   auctionEndsAt DateTime?
   status        ListingStatus @default(AVAILABLE)
-  imageUrls     String?   // JSON array of URLs or single URL
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  imageUrls     String? // JSON array of URLs or single URL
+  isFeatured    Boolean       @default(false)
+  viewCount     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
+  images    ListingImage[]
   purchases Purchase[]
   bids      Bid[]
+  reports   Report[]
+  messageThreads MessageThread[]
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([listingId, position])
 }
 
 model Bid {
@@ -66,17 +96,30 @@ enum ListingStatus {
 }
 
 model Purchase {
-  id           String   @id @default(cuid())
+  id           String         @id @default(cuid())
   listingId    String
-  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing      Listing        @relation(fields: [listingId], references: [id], onDelete: Cascade)
   buyerId      String
-  buyer        User     @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
-  finalPrice   Decimal  @db.Decimal(10, 2)
-  purchasedAt  DateTime @default(now())
+  buyer        User           @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId     String
+  seller       User           @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  status       PurchaseStatus @default(PENDING)
+  finalPrice   Decimal        @db.Decimal(10, 2)
+  meetupDate   DateTime?
+  purchasedAt  DateTime       @default(now())
 
   review Review?
+  meetup Meetup?
 
   @@unique([listingId])
+  @@index([buyerId, status])
+  @@index([sellerId, status])
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
 model Review {
@@ -104,4 +147,85 @@ model Notification {
   linkUrl   String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model SellerProfile {
+  userId         String   @id
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName    String
+  bio            String?
+  averageRating  Float    @default(0)
+  reviewCount    Int      @default(0)
+  totalSales     Int      @default(0)
+  joinedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model MessageThread {
+  id        String    @id @default(cuid())
+  userAId   String
+  userA     User      @relation("ThreadUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId   String
+  userB     User      @relation("ThreadUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  listingId String?
+  listing   Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userAId, userBId, listingId])
+}
+
+model Message {
+  id        String        @id @default(cuid())
+  threadId  String
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body      String
+  read      Boolean       @default(false)
+  createdAt DateTime      @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+model Meetup {
+  id         String       @id @default(cuid())
+  purchaseId String       @unique
+  purchase   Purchase     @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  startTime  DateTime
+  endTime    DateTime?
+  location   String?
+  status     MeetupStatus @default(SCHEDULED)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+enum MeetupStatus {
+  SCHEDULED
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model Report {
+  id           String      @id @default(cuid())
+  reporterId   String
+  reporter     User        @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetUserId String?
+  targetUser   User?       @relation("ReportTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+  listingId    String?
+  listing      Listing?    @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  reason       String
+  details      String?
+  status       ReportStatus @default(OPEN)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
 }

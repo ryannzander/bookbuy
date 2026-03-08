@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+function isAllowedSchoolEmail(value: string) {
+  const email = value.trim().toLowerCase();
+  return /^[^@\s]+@([a-z0-9-]+\.)*utschools\.ca$/.test(email);
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -21,10 +26,15 @@ export default function SignupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isAllowedSchoolEmail(normalizedEmail)) {
+      setError("You must sign up with a .utschools.ca email address.");
+      return;
+    }
     setLoading(true);
     const supabase = createClient();
     const { error: err } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: { data: { name: name || undefined } },
     });
@@ -39,8 +49,8 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="mx-auto max-w-sm">
-        <Card>
+      <div className="mx-auto max-w-sm py-8 dashboard-theme">
+        <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
@@ -60,8 +70,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
-      <Card>
+    <div className="mx-auto max-w-sm py-8 dashboard-theme">
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Sign up</CardTitle>
           <CardDescription>Create a BookBuy account</CardDescription>
@@ -86,11 +96,15 @@ export default function SignupPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@school.edu"
+                placeholder="you@school.utschools.ca"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                pattern="^[^@\s]+@([a-zA-Z0-9-]+\.)*utschools\.ca$"
               />
+              <p className="text-xs text-muted-foreground">
+                Use your school email (.utschools.ca) to get a verified seller badge.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

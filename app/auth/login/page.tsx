@@ -34,8 +34,8 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
-      <Card>
+    <div className="mx-auto max-w-sm py-8 dashboard-theme">
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Log in</CardTitle>
           <CardDescription>Sign in to your BookBuy account</CardDescription>
@@ -50,7 +50,7 @@ function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@school.edu"
+                placeholder="you@school.utschools.ca"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
