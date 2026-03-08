@@ -78,9 +78,9 @@ function MarketplaceContent() {
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
         <p className="mt-1 text-muted-foreground">Find textbooks from students at your school</p>
       </div>
 
@@ -194,7 +194,7 @@ function MarketplaceContent() {
               </select>
             </div>
           </div>
-          <Button onClick={applyFilters} className="mt-1">
+          <Button onClick={applyFilters} className="mt-1 w-full sm:w-auto">
             Apply filters
           </Button>
         </CardContent>
