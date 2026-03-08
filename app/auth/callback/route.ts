@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { db } from "@/server/db";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -9,6 +10,13 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const dbUser = await db.user.findUnique({ where: { id: user.id }, select: { onboarded: true } });
+        if (dbUser && !dbUser.onboarded) {
+          return NextResponse.redirect(`${origin}/onboarding`);
+        }
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

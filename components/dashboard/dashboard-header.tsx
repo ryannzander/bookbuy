@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Bell, Search, Settings, LogOut } from "lucide-react";
 import type { User } from "@/types/entities";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,12 +67,8 @@ export function DashboardHeader({
           )}
         </Link>
 
-        {/* Settings */}
-        <Link
-          href="/settings"
-          aria-label="Settings"
-          className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all duration-200"
-        >
+        <ThemeToggle />
+        <Link href="/settings" aria-label="Settings" className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all duration-200">
           <Settings className="h-4 w-4" />
         </Link>
 

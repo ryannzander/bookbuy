@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createNotification } from "@/server/api/notifications";
 
 function normalizeThreadUsers(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
@@ -77,20 +78,23 @@ export const messageRouter = createTRPCRouter({
       if (!thread || (thread.userAId !== ctx.userId && thread.userBId !== ctx.userId)) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
-      return ctx.db.$transaction(async (tx) => {
-        const message = await tx.message.create({
-          data: {
-            threadId: thread.id,
-            senderId: ctx.userId,
-            body: input.body,
-          },
+      const recipientId = thread.userAId === ctx.userId ? thread.userBId : thread.userAId;
+      const sender = await ctx.db.user.findUnique({ where: { id: ctx.userId }, select: { name: true } });
+      const message = await ctx.db.$transaction(async (tx) => {
+        const msg = await tx.message.create({
+          data: { threadId: thread.id, senderId: ctx.userId, body: input.body },
         });
-        await tx.messageThread.update({
-          where: { id: thread.id },
-          data: { updatedAt: new Date() },
-        });
-        return message;
+        await tx.messageThread.update({ where: { id: thread.id }, data: { updatedAt: new Date() } });
+        return msg;
       });
+      await createNotification(ctx.db, {
+        userId: recipientId,
+        type: "MESSAGE",
+        title: "New message",
+        body: `${sender?.name ?? "Someone"}: ${input.body.slice(0, 80)}${input.body.length > 80 ? "..." : ""}`,
+        linkUrl: `/messages?thread=${thread.id}`,
+      });
+      return message;
     }),
 
   markRead: protectedProcedure

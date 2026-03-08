@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, BookOpen } from "lucide-react";
+import { ImageUpload } from "@/components/image-upload";
 
 const schema = z
   .object({
@@ -41,6 +42,7 @@ type FormData = z.infer<typeof schema>;
 export default function NewListingPage() {
   const router = useRouter();
   const [type, setType] = useState<"FIXED" | "AUCTION">("FIXED");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -69,6 +71,7 @@ export default function NewListingPage() {
       auctionEndsAt: values.auctionEndsAt
         ? new Date(values.auctionEndsAt)
         : undefined,
+      imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined,
     });
   }
 
@@ -101,6 +104,10 @@ export default function NewListingPage() {
       {/* Form */}
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-2">
+            <Label>Photos</Label>
+            <ImageUpload value={imageUrls} onChange={setImageUrls} maxImages={5} />
+          </div>
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="title">Title</Label>

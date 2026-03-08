@@ -10,6 +10,10 @@ import { messageRouter } from "@/server/api/routers/message";
 import { meetupRouter } from "@/server/api/routers/meetup";
 import { reportRouter } from "@/server/api/routers/report";
 import { analyticsRouter } from "@/server/api/routers/analytics";
+import { wishlistRouter } from "@/server/api/routers/wishlist";
+import { adminRouter } from "@/server/api/routers/admin";
+import { courseRouter } from "@/server/api/routers/course";
+import { priceRouter } from "@/server/api/routers/price";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -23,6 +27,10 @@ export const appRouter = createTRPCRouter({
   meetup: meetupRouter,
   report: reportRouter,
   analytics: analyticsRouter,
+  wishlist: wishlistRouter,
+  admin: adminRouter,
+  course: courseRouter,
+  price: priceRouter,
 });
 
 export type AppRouter = typeof appRouter;

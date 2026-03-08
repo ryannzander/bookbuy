@@ -29,6 +29,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? undefined,
                   schoolName: supabaseUser.user_metadata?.school_name ?? undefined,
                   verified: isUTSchoolsEmail(supabaseUser.email),
+        lastActiveAt: new Date(),
       },
     });
   }
