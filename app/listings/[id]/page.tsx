@@ -15,6 +15,7 @@ import {
   MessageSquare,
   ShoppingCart,
   Star,
+  Trash2,
   User,
 } from "lucide-react";
 
@@ -60,6 +61,9 @@ export default function ListingDetailPage() {
     },
   });
   const reportMutation = api.report.create.useMutation();
+  const deleteMutation = api.listing.delete.useMutation({
+    onSuccess: () => router.push("/dashboard/listings"),
+  });
 
   if (isLoading) {
     return (
@@ -290,12 +294,27 @@ export default function ListingDetailPage() {
               )}
 
               {isOwner && isAvailable && (
-                <Link href={`/listings/${id}/edit`} className="block">
-                  <Button variant="outline" size="lg" className="w-full gap-2">
-                    <Edit className="h-5 w-5" />
-                    Edit Listing
+                <div className="flex gap-2">
+                  <Link href={`/listings/${id}/edit`} className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full gap-2">
+                      <Edit className="h-5 w-5" /> Edit
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="destructive"
+                    size="lg"
+                    className="gap-2"
+                    onClick={() => {
+                      if (confirm("Delete this listing? This cannot be undone.")) {
+                        deleteMutation.mutate({ id });
+                      }
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="h-5 w-5" />
+                    {deleteMutation.isPending ? "..." : "Delete"}
                   </Button>
-                </Link>
+                </div>
               )}
             </div>
 
