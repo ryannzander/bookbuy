@@ -66,7 +66,7 @@ export default function ListingDetailPage() {
       <Card>
         <CardHeader className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-medium ${listing.type === "AUCTION" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
+            <span className="inline-flex rounded-lg px-2.5 py-1 text-xs font-medium bg-primary/20 text-primary">
               {listing.type}
             </span>
             <span className="text-sm text-muted-foreground">{listing.subject} · {listing.condition}</span>

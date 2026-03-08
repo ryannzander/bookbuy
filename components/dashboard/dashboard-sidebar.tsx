@@ -26,10 +26,10 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 shrink-0 flex flex-col border-r border-[#2e2e2e] bg-[#1a1a1a]">
+    <aside className="w-64 shrink-0 flex flex-col border-r border-border bg-background">
       <div className="p-6">
-        <Link href="/" className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
-          <span className="h-8 w-8 rounded-xl bg-[#4ade80] text-[#1a1a1a] inline-flex items-center justify-center">
+        <Link href="/" className="text-xl font-bold text-foreground tracking-tight flex items-center gap-3">
+          <span className="h-8 w-8 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center">
             <BookOpen className="h-4 w-4" />
           </span>
           BookBuy
@@ -48,8 +48,8 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-[#242424] text-[#4ade80]"
-                  : "text-[#a3a3a3] hover:bg-[#242424] hover:text-white"
+                  ? "bg-card text-primary border border-border"
+                  : "text-muted-foreground hover:bg-card hover:text-foreground"
               )}
             >
               <Icon className="h-5 w-5 shrink-0" />
@@ -61,26 +61,26 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
       <div className="p-3">
         <Link
           href="/notifications"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#a3a3a3] hover:bg-[#242424] hover:text-white transition-colors"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
         >
           <Bell className="h-5 w-5 shrink-0" />
           Notifications
           {unreadCount > 0 && (
-            <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#4ade80] px-1.5 text-xs font-semibold text-[#1a1a1a]">
+            <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </Link>
       </div>
       <div className="p-4">
-        <div className="rounded-2xl bg-[#242424] border border-[#2e2e2e] p-4">
-          <p className="text-sm font-semibold text-white">Create a new listing</p>
-          <p className="mt-1 text-xs text-[#a3a3a3]">
+        <div className="rounded-2xl bg-card border border-border p-4">
+          <p className="text-sm font-semibold text-foreground">Create a new listing</p>
+          <p className="mt-1 text-xs text-muted-foreground">
             Post your textbook and connect with students looking for your course materials.
           </p>
           <Link
             href="/listings/new"
-            className="mt-3 flex items-center justify-center rounded-xl bg-[#4ade80] px-3 py-2 text-sm font-semibold text-[#1a1a1a] hover:bg-[#22c55e] transition-colors"
+            className="mt-3 flex items-center justify-center rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-colors"
           >
             List a Book
           </Link>

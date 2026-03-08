@@ -34,15 +34,15 @@ export function StatsCards({ stats }: { stats: DashboardStats }) {
         return (
           <div
             key={card.label}
-            className="rounded-2xl bg-[#242424] border border-[#2e2e2e] p-5"
+            className="rounded-2xl bg-card border border-border p-5"
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-[#a3a3a3]">
+              <span className="text-sm font-medium text-muted-foreground">
                 {card.label}
               </span>
-              <Icon className="h-5 w-5 text-[#4ade80]" />
+              <Icon className="h-5 w-5 text-primary" />
             </div>
-            <p className="mt-2 text-2xl font-bold text-white tracking-tight">
+            <p className="mt-2 text-2xl font-bold text-foreground tracking-tight">
               {card.value}
             </p>
           </div>

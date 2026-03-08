@@ -26,7 +26,7 @@ export default function NotificationsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Notifications</h1>
+        <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
         {items.some((n) => !n.read) && (
           <Button variant="outline" size="sm" onClick={markAllRead} disabled={markRead.isPending}>
             Mark all as read
@@ -43,7 +43,7 @@ export default function NotificationsPage() {
               href={n.linkUrl ?? "#"}
               onClick={() => !n.read && markRead.mutate({ id: n.id })}
             >
-              <Card className={n.read ? "opacity-80" : ""}>
+              <Card className={n.read ? "opacity-80" : "border-primary/30"}>
                 <CardContent className="flex items-start justify-between gap-4 py-4">
                   <div>
                     <p className="font-medium">{n.title}</p>

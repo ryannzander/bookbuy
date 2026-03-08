@@ -25,11 +25,11 @@ export function DashboardHeader({
         <button
           type="button"
           aria-label="Notifications"
-          className="relative h-9 w-9 rounded-full bg-[#242424] border border-[#2e2e2e] flex items-center justify-center text-[#d4d4d4] hover:text-white"
+          className="relative h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#4ade80] px-1 text-[10px] font-semibold text-[#1a1a1a]">
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -37,18 +37,18 @@ export function DashboardHeader({
         <button
           type="button"
           aria-label="Settings"
-          className="h-9 w-9 rounded-full bg-[#242424] border border-[#2e2e2e] flex items-center justify-center text-[#d4d4d4] hover:text-white"
+          className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
         >
           <Settings className="h-4 w-4" />
         </button>
-        <div className="h-9 w-9 rounded-full bg-[#242424] border border-[#2e2e2e] flex items-center justify-center text-sm font-semibold text-[#4ade80]">
+        <div className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-sm font-semibold text-primary">
           {user.name?.[0] ?? user.email[0] ?? "?"}
         </div>
         <div className="hidden sm:block">
-          <p className="text-sm font-semibold text-white">
+          <p className="text-sm font-semibold text-foreground">
             {user.name ?? "User"}
           </p>
-          <p className="text-xs text-[#a3a3a3]">Student Seller</p>
+          <p className="text-xs text-muted-foreground">Student Seller</p>
         </div>
       </div>
     </header>

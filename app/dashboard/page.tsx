@@ -30,8 +30,8 @@ export default async function DashboardPage() {
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Dashboard</h1>
-          <p className="mt-1 text-sm text-[#a3a3a3]">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
             Welcome back, {data.user.name ?? data.user.email}. Here is your marketplace pulse.
           </p>
         </div>
@@ -40,10 +40,10 @@ export default async function DashboardPage() {
 
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Your live listings</h2>
+            <h2 className="text-lg font-semibold text-foreground">Your live listings</h2>
             <Link
               href="/listings/new"
-              className="rounded-xl bg-[#4ade80] px-4 py-2 text-sm font-semibold text-[#1a1a1a] hover:bg-[#22c55e] transition-colors"
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-colors"
             >
               List a Book
             </Link>
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
         <StatsChart data={data.activitySeries} />
 
         <section>
-          <h2 className="text-lg font-semibold text-white mb-4">Recent exchanges</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Recent exchanges</h2>
           {data.recentOrders.length === 0 ? (
             <EmptyState
               title="No exchanges yet"
@@ -69,15 +69,15 @@ export default async function DashboardPage() {
               {data.recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="rounded-2xl bg-[#242424] border border-[#2e2e2e] p-4 flex items-center justify-between"
+                  className="rounded-2xl bg-card border border-border p-4 flex items-center justify-between"
                 >
                   <div>
-                    <p className="font-medium text-white">{order.listingTitle ?? order.listingId}</p>
-                    <p className="text-sm text-[#a3a3a3]">
+                    <p className="font-medium text-foreground">{order.listingTitle ?? order.listingId}</p>
+                    <p className="text-sm text-muted-foreground">
                       ${order.priceAtPurchase} · {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <span className="rounded-lg border border-[#2e2e2e] px-3 py-1 text-xs text-[#d4d4d4]">
+                  <span className="rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground">
                     {order.status}
                   </span>
                 </div>

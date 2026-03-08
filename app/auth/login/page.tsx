@@ -34,7 +34,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-sm py-8">
+    <div className="mx-auto max-w-sm py-8 dashboard-theme">
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Log in</CardTitle>

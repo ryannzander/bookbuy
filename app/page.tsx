@@ -175,7 +175,7 @@ function MarketplaceContent() {
                 <Card className="h-full transition-all duration-200 hover:shadow-md hover:border-border group-hover:bg-card">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs font-medium ${listing.type === "AUCTION" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
+                      <span className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium bg-primary/20 text-primary">
                         {listing.type === "AUCTION" ? "Auction" : "Buy now"}
                       </span>
                       {listing.type === "AUCTION" && listing.bids?.[0] && (

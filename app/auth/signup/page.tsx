@@ -39,7 +39,7 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="mx-auto max-w-sm py-8">
+      <div className="mx-auto max-w-sm py-8 dashboard-theme">
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
@@ -60,7 +60,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm py-8">
+    <div className="mx-auto max-w-sm py-8 dashboard-theme">
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Sign up</CardTitle>
