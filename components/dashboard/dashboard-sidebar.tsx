@@ -14,6 +14,8 @@ import {
   Trophy,
   Settings,
   Plus,
+  Heart,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +25,8 @@ const navItems = [
   { href: "/dashboard/listings", label: "My Listings", icon: List },
   { href: "/dashboard/orders", label: "Orders", icon: ArrowRightLeft },
   { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/wishlist", label: "Saved Books", icon: Heart },
+  { href: "/courses", label: "My Courses", icon: GraduationCap },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
@@ -42,7 +46,7 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
           <span className="h-10 w-10 rounded-xl bg-foreground text-background inline-flex items-center justify-center">
             <BookOpen className="h-5 w-5" />
           </span>
-          <span>BookBuy</span>
+          <span>BuyBook</span>
         </Link>
       </div>
 

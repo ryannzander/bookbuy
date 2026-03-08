@@ -1,0 +1,18 @@
+{
+  "name": "BuyBook – School Book Exchange",
+  "short_name": "BuyBook",
+  "description": "List, buy, and sell textbooks at your school.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

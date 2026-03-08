@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, BookOpen } from "lucide-react";
+import { ImageUpload } from "@/components/image-upload";
 
 const schema = z
   .object({
@@ -41,6 +42,7 @@ type FormData = z.infer<typeof schema>;
 export default function NewListingPage() {
   const router = useRouter();
   const [type, setType] = useState<"FIXED" | "AUCTION">("FIXED");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -69,12 +71,12 @@ export default function NewListingPage() {
       auctionEndsAt: values.auctionEndsAt
         ? new Date(values.auctionEndsAt)
         : undefined,
+      imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined,
     });
   }
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Header */}
       <div className="mb-8">
         <Link
           href="/marketplace"
@@ -88,83 +90,56 @@ export default function NewListingPage() {
             <BookOpen className="h-7 w-7" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Create a Listing
-            </h1>
-            <p className="text-muted-foreground">
-              Add your textbook to the marketplace
-            </p>
+            <h1 className="text-2xl font-bold text-foreground">Create a Listing</h1>
+            <p className="text-muted-foreground">Add your textbook to the marketplace</p>
           </div>
         </div>
       </div>
 
-      {/* Form */}
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>Photos</Label>
+            <ImageUpload value={imageUrls} onChange={setImageUrls} maxImages={5} />
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                {...form.register("title")}
-                placeholder="Calculus: Early Transcendentals"
-              />
+              <Input id="title" {...form.register("title")} placeholder="Calculus: Early Transcendentals" />
               {form.formState.errors.title && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.title.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="author">Author</Label>
-              <Input
-                id="author"
-                {...form.register("author")}
-                placeholder="James Stewart"
-              />
+              <Input id="author" {...form.register("author")} placeholder="James Stewart" />
               {form.formState.errors.author && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.author.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.author.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="isbn">ISBN</Label>
-              <Input
-                id="isbn"
-                {...form.register("isbn")}
-                placeholder="978-0-13-499554-4"
-              />
+              <Input id="isbn" {...form.register("isbn")} placeholder="978-0-13-499554-4" />
               {form.formState.errors.isbn && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.isbn.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.isbn.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="subject">Subject</Label>
-              <Input
-                id="subject"
-                {...form.register("subject")}
-                placeholder="Math, Biology, etc."
-              />
+              <Input id="subject" {...form.register("subject")} placeholder="Math, Biology, etc." />
               {form.formState.errors.subject && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.subject.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.subject.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="courseCode">Course Code (optional)</Label>
-              <Input
-                id="courseCode"
-                {...form.register("courseCode")}
-                placeholder="MATH 221"
-              />
+              <Input id="courseCode" {...form.register("courseCode")} placeholder="MATH 221" />
             </div>
 
             <div className="space-y-2">
@@ -181,19 +156,13 @@ export default function NewListingPage() {
                 <option value="Worn">Worn</option>
               </select>
               {form.formState.errors.condition && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.condition.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.condition.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="edition">Edition (optional)</Label>
-              <Input
-                id="edition"
-                {...form.register("edition")}
-                placeholder="8th edition"
-              />
+              <Input id="edition" {...form.register("edition")} placeholder="8th edition" />
             </div>
 
             <div className="space-y-2 sm:col-span-2">
@@ -209,17 +178,9 @@ export default function NewListingPage() {
 
             <div className="space-y-2">
               <Label htmlFor="price">Price ($)</Label>
-              <Input
-                id="price"
-                type="number"
-                step={0.01}
-                {...form.register("price")}
-                placeholder="25.00"
-              />
+              <Input id="price" type="number" step={0.01} {...form.register("price")} placeholder="25.00" />
               {form.formState.errors.price && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.price.message}
-                </p>
+                <p className="text-sm text-destructive">{form.formState.errors.price.message}</p>
               )}
             </div>
 
@@ -243,15 +204,9 @@ export default function NewListingPage() {
             {type === "AUCTION" && (
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="auctionEndsAt">Auction End Date & Time</Label>
-                <Input
-                  id="auctionEndsAt"
-                  type="datetime-local"
-                  {...form.register("auctionEndsAt")}
-                />
+                <Input id="auctionEndsAt" type="datetime-local" {...form.register("auctionEndsAt")} />
                 {form.formState.errors.auctionEndsAt && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.auctionEndsAt.message}
-                  </p>
+                  <p className="text-sm text-destructive">{form.formState.errors.auctionEndsAt.message}</p>
                 )}
               </div>
             )}
@@ -262,18 +217,11 @@ export default function NewListingPage() {
           )}
 
           <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              size="lg"
-              disabled={create.isPending}
-              className="flex-1 sm:flex-none"
-            >
+            <Button type="submit" size="lg" disabled={create.isPending} className="flex-1 sm:flex-none">
               {create.isPending ? "Creating..." : "Create Listing"}
             </Button>
             <Link href="/marketplace">
-              <Button type="button" variant="outline" size="lg">
-                Cancel
-              </Button>
+              <Button type="button" variant="outline" size="lg">Cancel</Button>
             </Link>
           </div>
         </form>

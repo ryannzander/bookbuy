@@ -175,7 +175,7 @@ export default function LandingPage() {
               <span className="h-9 w-9 rounded-xl bg-foreground text-background inline-flex items-center justify-center">
                 <BookOpen className="h-4 w-4" />
               </span>
-              <span className="font-bold text-foreground">BookBuy</span>
+              <span className="font-bold text-foreground">BuyBook</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Built for students, by students.

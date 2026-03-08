@@ -141,7 +141,7 @@ export const listingRouter = createTRPCRouter({
       if (input.type === "AUCTION" && !input.auctionEndsAt) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Auction must have auctionEndsAt" });
       }
-      return ctx.db.listing.create({
+      const listing = await ctx.db.listing.create({
         data: {
           sellerId: ctx.userId,
           title: input.title,
@@ -159,6 +159,10 @@ export const listingRouter = createTRPCRouter({
           isFeatured: input.isFeatured ?? false,
         },
       });
+      await ctx.db.priceHistory.create({
+        data: { listingId: listing.id, price: input.price },
+      });
+      return listing;
     }),
 
   update: protectedProcedure
@@ -172,6 +176,29 @@ export const listingRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot edit sold or ended listing" });
       }
       const { id, ...data } = input;
+      if (data.price != null && data.price !== Number(listing.price)) {
+        await ctx.db.priceHistory.create({
+          data: { listingId: id, price: data.price },
+        });
+        const alerts = await ctx.db.priceAlert.findMany({
+          where: { listingId: id, triggered: false, targetPrice: { gte: data.price } },
+        });
+        if (alerts.length > 0) {
+          await ctx.db.priceAlert.updateMany({
+            where: { id: { in: alerts.map((a) => a.id) } },
+            data: { triggered: true },
+          });
+          await ctx.db.notification.createMany({
+            data: alerts.map((a) => ({
+              userId: a.userId,
+              type: "PRICE_DROP",
+              title: "Price Drop Alert!",
+              body: `"${listing.title}" dropped to $${data.price}`,
+              linkUrl: `/listings/${id}`,
+            })),
+          });
+        }
+      }
       return ctx.db.listing.update({
         where: { id },
         data: {

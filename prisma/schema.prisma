@@ -6,6 +6,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id           String   @id
   email        String   @unique
@@ -14,6 +19,7 @@ model User {
   avatarUrl    String?
   schoolName   String?
   verified     Boolean  @default(false)
+  role         UserRole @default(USER)
   responseRate Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -31,6 +37,9 @@ model User {
   messages         Message[]
   reportsFiled     Report[]         @relation("ReportReporter")
   reportsReceived  Report[]         @relation("ReportTarget")
+  wishlists        Wishlist[]
+  priceAlerts      PriceAlert[]
+  courseSchedules  CourseSchedule[]
 }
 
 model Listing {
@@ -49,17 +58,20 @@ model Listing {
   type          ListingType
   auctionEndsAt DateTime?
   status        ListingStatus @default(AVAILABLE)
-  imageUrls     String? // JSON array of URLs or single URL
+  imageUrls     String?
   isFeatured    Boolean       @default(false)
   viewCount     Int           @default(0)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  images    ListingImage[]
-  purchases Purchase[]
-  bids      Bid[]
-  reports   Report[]
+  images         ListingImage[]
+  purchases      Purchase[]
+  bids           Bid[]
+  reports        Report[]
   messageThreads MessageThread[]
+  wishlists      Wishlist[]
+  priceAlerts    PriceAlert[]
+  priceHistory   PriceHistory[]
 }
 
 model ListingImage {
@@ -228,4 +240,53 @@ enum ReportStatus {
   UNDER_REVIEW
   RESOLVED
   DISMISSED
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  @@index([listingId, createdAt])
+}
+
+model PriceAlert {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  targetPrice Decimal  @db.Decimal(10, 2)
+  triggered   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([listingId])
+}
+
+model CourseSchedule {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseCode String
+  courseName String?
+  semester   String?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, courseCode])
+  @@index([userId])
 }

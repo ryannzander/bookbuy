@@ -17,6 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     {
       retry: false,
       enabled: !!me,
+      refetchInterval: 15_000,
     }
   );
 
@@ -62,6 +63,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               { href: "/marketplace", label: "Marketplace" },
               { href: "/dashboard/orders", label: "Orders" },
               { href: "/messages", label: "Messages" },
+              { href: "/wishlist", label: "Saved" },
+              { href: "/courses", label: "Courses" },
               { href: "/notifications", label: `Alerts${unreadCount > 0 ? ` (${unreadCount})` : ""}` },
               { href: "/settings", label: "Settings" },
             ].map((item) => (

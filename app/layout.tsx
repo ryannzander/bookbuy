@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { AppShell } from "@/components/app-shell";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
     shortcut: "/icon.svg",
     apple: "/icon.svg",
   },
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
@@ -42,6 +44,7 @@ export default function RootLayout({
           <AppShell>{children}</AppShell>
         </TRPCProvider>
         <Analytics />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
