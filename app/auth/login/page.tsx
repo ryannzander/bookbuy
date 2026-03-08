@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -9,30 +9,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BookOpen, ArrowRight } from "lucide-react";
 
+function cleanAuthError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials")) {
+    return "Incorrect email or password.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Please confirm your email before logging in.";
+  }
+  return message;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace(next);
+      }
+    });
+  }, [next, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     const supabase = createClient();
+    const normalizedEmail = email.trim().toLowerCase();
     const { error: err } = await supabase.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     });
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(cleanAuthError(err.message));
       return;
     }
-    router.push(next);
+    router.replace(next);
     router.refresh();
   }
 
@@ -45,7 +66,7 @@ function LoginForm() {
             <span className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center">
               <BookOpen className="h-6 w-6" />
             </span>
-            <span className="text-2xl font-bold text-foreground">BookBuy</span>
+            <span className="text-2xl font-bold text-foreground">BuyBook</span>
           </Link>
         </div>
 
@@ -54,7 +75,7 @@ function LoginForm() {
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
             <p className="mt-2 text-muted-foreground">
-              Sign in to your BookBuy account
+              Sign in to your BuyBook account
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +14,17 @@ function isAllowedSchoolEmail(value: string) {
   return /^[^@\s]+@utschools\.ca$/.test(email);
 }
 
+function cleanAuthError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("already registered") || lower.includes("user already")) {
+    return "An account with this email already exists. Try logging in.";
+  }
+  if (lower.includes("password")) {
+    return "Password is too weak. Use at least 6 characters.";
+  }
+  return message;
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -22,6 +33,15 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        router.replace("/dashboard");
+      }
+    });
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +60,7 @@ export default function SignupPage() {
     });
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(cleanAuthError(err.message));
       return;
     }
     setSent(true);
@@ -57,7 +77,7 @@ export default function SignupPage() {
               <span className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center">
                 <BookOpen className="h-6 w-6" />
               </span>
-              <span className="text-2xl font-bold text-foreground">BookBuy</span>
+              <span className="text-2xl font-bold text-foreground">BuyBook</span>
             </Link>
           </div>
 
@@ -96,7 +116,7 @@ export default function SignupPage() {
             <span className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center">
               <BookOpen className="h-6 w-6" />
             </span>
-            <span className="text-2xl font-bold text-foreground">BookBuy</span>
+              <span className="text-2xl font-bold text-foreground">BuyBook</span>
           </Link>
         </div>
 
