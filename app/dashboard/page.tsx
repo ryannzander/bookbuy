@@ -11,7 +11,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="mt-1 text-muted-foreground">Manage your listings and purchases</p>
+      </div>
 
       <section>
         <h2 className="mb-4 text-lg font-semibold">My listings</h2>

@@ -64,12 +64,14 @@ export default function ListingDetailPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Card>
-        <CardHeader>
-          <div className="flex justify-between gap-2 text-sm text-muted-foreground">
-            <span>{listing.type}</span>
-            {listing.subject} · {listing.condition}
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-medium ${listing.type === "AUCTION" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
+              {listing.type}
+            </span>
+            <span className="text-sm text-muted-foreground">{listing.subject} · {listing.condition}</span>
           </div>
-          <h1 className="text-2xl font-bold">{listing.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{listing.title}</h1>
           <p className="text-muted-foreground">{listing.author}</p>
           {listing.isbn && <p className="text-sm text-muted-foreground">ISBN: {listing.isbn}</p>}
         </CardHeader>

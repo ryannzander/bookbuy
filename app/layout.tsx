@@ -26,11 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
         <TRPCProvider>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1 container py-6">{children}</main>
+            <main className="flex-1 container max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
           </div>
         </TRPCProvider>
       </body>

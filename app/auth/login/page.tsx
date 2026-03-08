@@ -34,8 +34,8 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
-      <Card>
+    <div className="mx-auto max-w-sm py-8">
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Log in</CardTitle>
           <CardDescription>Sign in to your BookBuy account</CardDescription>

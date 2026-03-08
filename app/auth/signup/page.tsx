@@ -39,8 +39,8 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="mx-auto max-w-sm">
-        <Card>
+      <div className="mx-auto max-w-sm py-8">
+        <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
@@ -60,8 +60,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm">
-      <Card>
+    <div className="mx-auto max-w-sm py-8">
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Sign up</CardTitle>
           <CardDescription>Create a BookBuy account</CardDescription>

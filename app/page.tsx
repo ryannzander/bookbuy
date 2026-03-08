@@ -63,12 +63,15 @@ function MarketplaceContent() {
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Marketplace</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
+        <p className="mt-1 text-muted-foreground">Find textbooks from students at your school</p>
+      </div>
 
-      <Card>
+      <Card className="border-border/60">
         <CardHeader className="pb-3">
-          <Label className="text-sm font-medium">Filters</Label>
+          <Label className="text-sm font-semibold text-foreground">Filters</Label>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -94,7 +97,7 @@ function MarketplaceContent() {
               <Label htmlFor="condition">Condition</Label>
               <select
                 id="condition"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
               >
@@ -107,7 +110,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Type</Label>
               <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 value={type}
                 onChange={(e) => setType(e.target.value as "FIXED" | "AUCTION" | "")}
               >
@@ -141,7 +144,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Sort</Label>
               <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 value={sort}
                 onChange={(e) => setSort(e.target.value as "newest" | "priceAsc" | "priceDesc")}
               >
@@ -151,36 +154,43 @@ function MarketplaceContent() {
               </select>
             </div>
           </div>
-          <Button onClick={applyFilters}>Apply filters</Button>
+          <Button onClick={applyFilters} className="mt-1">Apply filters</Button>
         </CardContent>
       </Card>
 
       {isLoading ? (
-        <p className="text-muted-foreground">Loading listings…</p>
+        <div className="flex items-center justify-center py-16">
+          <p className="text-muted-foreground">Loading listings…</p>
+        </div>
       ) : items.length === 0 ? (
-        <p className="text-muted-foreground">No listings match your filters.</p>
+        <div className="rounded-xl border border-dashed border-border bg-muted/30 py-12 text-center">
+          <p className="text-muted-foreground">No listings match your filters.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Try adjusting or clearing filters.</p>
+        </div>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((listing) => (
-              <Link key={listing.id} href={`/listings/${listing.id}`}>
-                <Card className="h-full transition-colors hover:bg-accent/50">
+              <Link key={listing.id} href={`/listings/${listing.id}`} className="group">
+                <Card className="h-full transition-all duration-200 hover:shadow-md hover:border-border group-hover:bg-card">
                   <CardHeader className="pb-2">
-                    <div className="flex justify-between gap-2">
-                      <span className="text-xs text-muted-foreground">{listing.type}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs font-medium ${listing.type === "AUCTION" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"}`}>
+                        {listing.type === "AUCTION" ? "Auction" : "Buy now"}
+                      </span>
                       {listing.type === "AUCTION" && listing.bids?.[0] && (
-                        <span className="text-xs font-medium">
-                          High bid: ${Number(listing.bids[0].amount)}
+                        <span className="text-xs font-medium text-muted-foreground">
+                          ${Number(listing.bids[0].amount)} bid
                         </span>
                       )}
                     </div>
-                    <h2 className="font-semibold leading-tight">{listing.title}</h2>
+                    <h2 className="mt-2 font-semibold leading-snug text-foreground group-hover:text-primary">{listing.title}</h2>
                     <p className="text-sm text-muted-foreground">{listing.author}</p>
                   </CardHeader>
                   <CardContent className="pb-2">
-                    <p className="text-sm">
+                    <p className="text-lg font-semibold text-foreground">
                       ${Number(listing.price)}
-                      {listing.type === "AUCTION" && " starting bid"}
+                      {listing.type === "AUCTION" && <span className="text-sm font-normal text-muted-foreground"> starting bid</span>}
                     </p>
                     <p className="text-xs text-muted-foreground">{listing.condition} · {listing.subject}</p>
                   </CardContent>
@@ -194,9 +204,10 @@ function MarketplaceContent() {
             ))}
           </div>
           {hasNextPage && (
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-4">
               <Button
                 variant="outline"
+                size="lg"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
               >
