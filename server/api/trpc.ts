@@ -3,6 +3,10 @@ import superjson from "superjson";
 import { z } from "zod";
 import { db } from "@/server/db";
 
+function isUTSchoolsEmail(email: string | null | undefined) {
+  return (email ?? "").toLowerCase().endsWith("@utschools.ca");
+}
+
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const supabase = await import("@/lib/supabase/server").then((m) => m.createClient());
   const { data: { user: supabaseUser } } = await supabase.auth.getUser();
@@ -16,7 +20,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? null,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? null,
                   schoolName: supabaseUser.user_metadata?.school_name ?? null,
-                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
+                  verified: isUTSchoolsEmail(supabaseUser.email),
       },
       update: {
         email: supabaseUser.email ?? undefined,
@@ -24,7 +28,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? undefined,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? undefined,
                   schoolName: supabaseUser.user_metadata?.school_name ?? undefined,
-                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
+                  verified: isUTSchoolsEmail(supabaseUser.email),
       },
     });
   }

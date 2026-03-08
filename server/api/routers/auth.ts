@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 
+function isUTSchoolsEmail(email: string) {
+  return email.toLowerCase().endsWith("@utschools.ca");
+}
+
 export const authRouter = createTRPCRouter({
   syncUser: protectedProcedure
     .input(z.object({ email: z.string().email(), name: z.string().optional(), avatarUrl: z.string().optional() }))
@@ -13,13 +17,13 @@ export const authRouter = createTRPCRouter({
           name: input.name ?? null,
           avatarUrl: input.avatarUrl ?? null,
           username: input.email.split("@")[0],
-          verified: input.email.endsWith(".utschools.ca"),
+          verified: isUTSchoolsEmail(input.email),
         },
         update: {
           email: input.email,
           name: input.name ?? undefined,
           avatarUrl: input.avatarUrl ?? undefined,
-          verified: input.email.endsWith(".utschools.ca"),
+          verified: isUTSchoolsEmail(input.email),
         },
       });
       return { ok: true };

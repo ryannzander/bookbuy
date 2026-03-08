@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+function isUTSchoolsEmail(value: string) {
+  return value.trim().toLowerCase().endsWith("@utschools.ca");
+}
+
 export default function SettingsPage() {
   const supabase = useMemo(() => createClient(), []);
   const { data: me } = api.auth.me.useQuery();
@@ -22,7 +26,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage your account email, password, and avatar.
+          Manage your account email and password.
         </p>
       </div>
 
@@ -37,15 +41,23 @@ export default function SettingsPage() {
             <Input
               id="newEmail"
               type="email"
-              placeholder="you@school.utschools.ca"
+              placeholder="you@utschools.ca"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+          <p className="text-xs text-muted-foreground">
+            Email must be a valid @utschools.ca address.
+          </p>
           <Button
             onClick={async () => {
               setEmailMessage(null);
-              const { error } = await supabase.auth.updateUser({ email });
+              const normalizedEmail = email.trim().toLowerCase();
+              if (!isUTSchoolsEmail(normalizedEmail)) {
+                setEmailMessage("Email must end with @utschools.ca.");
+                return;
+              }
+              const { error } = await supabase.auth.updateUser({ email: normalizedEmail });
               if (error) {
                 setEmailMessage(error.message);
                 return;
