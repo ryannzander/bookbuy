@@ -25,7 +25,9 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
-    "@prisma/client": "^6.0.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "pg": "^8.13.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -40,7 +42,8 @@
     "@trpc/server": "^11.0.0-rc.600"
   },
   "devDependencies": {
-    "prisma": "^6.0.0",
+    "dotenv": "^16.4.5",
+    "prisma": "^7.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
