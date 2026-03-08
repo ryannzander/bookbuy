@@ -27,7 +27,26 @@ export const sellerRouter = createTRPCRouter({
         reviewsReceived.length > 0
           ? reviewsReceived.reduce((s, r) => s + r.rating, 0) / reviewsReceived.length
           : null;
-      return { user, listings, reviewsReceived, avgRating };
+      const threads = await ctx.db.messageThread.findMany({
+        where: { OR: [{ userAId: input.userId }, { userBId: input.userId }] },
+        include: {
+          messages: { orderBy: { createdAt: "asc" }, select: { senderId: true, createdAt: true } },
+        },
+      });
+      let totalResponseMs = 0;
+      let responseCount = 0;
+      for (const thread of threads) {
+        for (let i = 1; i < thread.messages.length; i++) {
+          const prev = thread.messages[i - 1];
+          const curr = thread.messages[i];
+          if (prev.senderId !== input.userId && curr.senderId === input.userId) {
+            totalResponseMs += new Date(curr.createdAt).getTime() - new Date(prev.createdAt).getTime();
+            responseCount++;
+          }
+        }
+      }
+      const avgResponseMinutes = responseCount > 0 ? Math.round(totalResponseMs / responseCount / 60000) : null;
+      return { user, listings, reviewsReceived, avgRating, avgResponseMinutes };
     }),
 
   getLeaderboard: publicProcedure

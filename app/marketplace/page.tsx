@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, Suspense } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/trpc/client";
@@ -8,6 +8,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BookOpen, Filter, Search, Star, X } from "lucide-react";
+
+function SearchAutocomplete({ value, onChange, onSubmit }: { value: string; onChange: (v: string) => void; onSubmit: () => void }) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => { setQuery(value); }, [value]);
+
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+    if (query.trim().length < 2) { setDebouncedQuery(""); return; }
+    timerRef.current = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    return () => clearTimeout(timerRef.current);
+  }, [query]);
+
+  const { data: results } = api.listing.search.useQuery(
+    { query: debouncedQuery },
+    { enabled: debouncedQuery.length >= 2 }
+  );
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative flex-1">
+      <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        placeholder="Search by title, author, or ISBN..."
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => { if (e.key === "Enter") { setOpen(false); onSubmit(); } }}
+        className="pl-12 h-14 text-base"
+      />
+      {open && results && results.length > 0 && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-2 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+          {results.map((r) => (
+            <Link key={r.id} href={`/listings/${r.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-secondary transition-colors" onClick={() => setOpen(false)}>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground text-sm truncate">{r.title}</p>
+                <p className="text-xs text-muted-foreground">{r.author}{r.courseCode ? ` · ${r.courseCode}` : ""}</p>
+              </div>
+              <span className="text-sm font-bold text-foreground ml-3">${Number(r.price)}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const CONDITIONS = ["Like New", "Good", "Acceptable", "Worn"];
 const SORT_OPTIONS = [
@@ -117,16 +172,7 @@ function MarketplaceContent() {
 
       {/* Search and Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by title, author, or ISBN..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-            className="pl-12 h-14 text-base"
-          />
-        </div>
+        <SearchAutocomplete value={search} onChange={setSearch} onSubmit={applyFilters} />
         <Button
           variant="outline"
           size="lg"
@@ -292,9 +338,8 @@ function MarketplaceContent() {
                   className="group"
                 >
                   <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-muted-foreground/30 transition-all duration-200">
-                    {/* Image placeholder */}
-                    <div className="aspect-[4/3] bg-secondary flex items-center justify-center">
-                      <BookOpen className="h-12 w-12 text-muted-foreground/30" />
+                    <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
+                      {listing.imageUrls ? (() => { try { const imgs = JSON.parse(listing.imageUrls); return imgs[0] ? <img src={imgs[0]} alt={listing.title} className="h-full w-full object-cover" /> : <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } catch { return <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } })() : <BookOpen className="h-12 w-12 text-muted-foreground/30" />}
                     </div>
 
                     {/* Content */}

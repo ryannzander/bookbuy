@@ -159,9 +159,7 @@ export const listingRouter = createTRPCRouter({
           isFeatured: input.isFeatured ?? false,
         },
       });
-      await ctx.db.priceHistory.create({
-        data: { listingId: listing.id, price: input.price },
-      });
+      await ctx.db.priceHistory.create({ data: { listingId: listing.id, price: input.price } });
       return listing;
     }),
 
@@ -177,24 +175,16 @@ export const listingRouter = createTRPCRouter({
       }
       const { id, ...data } = input;
       if (data.price != null && data.price !== Number(listing.price)) {
-        await ctx.db.priceHistory.create({
-          data: { listingId: id, price: data.price },
-        });
+        await ctx.db.priceHistory.create({ data: { listingId: id, price: data.price } });
         const alerts = await ctx.db.priceAlert.findMany({
           where: { listingId: id, triggered: false, targetPrice: { gte: data.price } },
         });
         if (alerts.length > 0) {
-          await ctx.db.priceAlert.updateMany({
-            where: { id: { in: alerts.map((a) => a.id) } },
-            data: { triggered: true },
-          });
+          await ctx.db.priceAlert.updateMany({ where: { id: { in: alerts.map((a) => a.id) } }, data: { triggered: true } });
           await ctx.db.notification.createMany({
             data: alerts.map((a) => ({
-              userId: a.userId,
-              type: "PRICE_DROP",
-              title: "Price Drop Alert!",
-              body: `"${listing.title}" dropped to $${data.price}`,
-              linkUrl: `/listings/${id}`,
+              userId: a.userId, type: "PRICE_DROP", title: "Price Drop Alert!",
+              body: `"${listing.title}" dropped to $${data.price}`, linkUrl: `/listings/${id}`,
             })),
           });
         }
@@ -219,4 +209,66 @@ export const listingRouter = createTRPCRouter({
       await ctx.db.listing.delete({ where: { id: input.id } });
       return { ok: true };
     }),
+
+  getSimilar: publicProcedure
+    .input(z.object({ listingId: z.string(), limit: z.number().min(1).max(10).default(4) }))
+    .query(async ({ ctx, input }) => {
+      const listing = await ctx.db.listing.findUnique({ where: { id: input.listingId }, select: { subject: true, courseCode: true, sellerId: true } });
+      if (!listing) return [];
+      return ctx.db.listing.findMany({
+        where: {
+          id: { not: input.listingId },
+          status: "AVAILABLE",
+          OR: [
+            ...(listing.courseCode ? [{ courseCode: listing.courseCode }] : []),
+            { subject: listing.subject },
+          ],
+        },
+        include: { seller: { select: { id: true, name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: input.limit,
+      });
+    }),
+
+  search: publicProcedure
+    .input(z.object({ query: z.string().min(1).max(100) }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.listing.findMany({
+        where: {
+          status: "AVAILABLE",
+          OR: [
+            { title: { contains: input.query, mode: "insensitive" } },
+            { author: { contains: input.query, mode: "insensitive" } },
+            { isbn: { contains: input.query, mode: "insensitive" } },
+            { courseCode: { contains: input.query, mode: "insensitive" } },
+          ],
+        },
+        select: { id: true, title: true, author: true, price: true, courseCode: true },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+      });
+    }),
+
+  bulkDelete: protectedProcedure
+    .input(z.object({ ids: z.array(z.string()).min(1).max(50) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.listing.deleteMany({ where: { id: { in: input.ids }, sellerId: ctx.userId } });
+      return { ok: true };
+    }),
+
+  bulkMarkSold: protectedProcedure
+    .input(z.object({ ids: z.array(z.string()).min(1).max(50) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.listing.updateMany({ where: { id: { in: input.ids }, sellerId: ctx.userId, status: "AVAILABLE" }, data: { status: "SOLD" } });
+      return { ok: true };
+    }),
+
+  archiveExpired: publicProcedure.mutation(async ({ ctx }) => {
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    const result = await ctx.db.listing.updateMany({
+      where: { status: "AVAILABLE", updatedAt: { lt: ninetyDaysAgo } },
+      data: { status: "SOLD" },
+    });
+    return { archived: result.count };
+  }),
 });
