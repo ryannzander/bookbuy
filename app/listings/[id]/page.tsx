@@ -66,6 +66,12 @@ export default function ListingDetailPage() {
   const minBid = highBid ? Number(highBid.amount) + 0.01 : Number(listing.price);
   const endsAtLabel = formatEndsAt(listing.auctionEndsAt);
   const hasEnded = listing.auctionEndsAt && new Date(listing.auctionEndsAt) <= new Date();
+  const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
+  const sellerAvgRating =
+    sellerReviewCount > 0
+      ? listing.seller.reviewsReceived.reduce((sum, review) => sum + review.rating, 0) /
+        sellerReviewCount
+      : null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -98,6 +104,11 @@ export default function ListingDetailPage() {
             <Link href={`/sellers/${listing.seller.id}`} className="text-sm text-primary hover:underline">
               {listing.seller.name ?? "Seller"}
             </Link>
+            <span className="text-xs text-muted-foreground">
+              {sellerAvgRating != null
+                ? `${sellerAvgRating.toFixed(1)} / 5 (${sellerReviewCount} reviews)`
+                : "No reviews yet"}
+            </span>
             {!isOwner && (
               <Button
                 variant="outline"

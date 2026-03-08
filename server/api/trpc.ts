@@ -16,7 +16,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? null,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? null,
                   schoolName: supabaseUser.user_metadata?.school_name ?? null,
-                  verified: (supabaseUser.email ?? "").endsWith(".edu"),
+                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
       },
       update: {
         email: supabaseUser.email ?? undefined,
@@ -24,7 +24,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name ?? undefined,
         avatarUrl: supabaseUser.user_metadata?.avatar_url ?? undefined,
                   schoolName: supabaseUser.user_metadata?.school_name ?? undefined,
-                  verified: (supabaseUser.email ?? "").endsWith(".edu"),
+                  verified: (supabaseUser.email ?? "").endsWith(".utschools.ca"),
       },
     });
   }

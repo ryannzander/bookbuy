@@ -168,7 +168,7 @@ export default function NewListingPage() {
               <Button type="submit" disabled={create.isPending}>
                 {create.isPending ? "Creating…" : "Create listing"}
               </Button>
-              <Link href="/">
+              <Link href="/marketplace">
                 <Button type="button" variant="outline">Cancel</Button>
               </Link>
             </div>

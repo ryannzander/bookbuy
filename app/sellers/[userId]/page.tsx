@@ -24,13 +24,6 @@ export default function SellerPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            {user.avatarUrl && (
-              <img
-                src={user.avatarUrl}
-                alt=""
-                className="h-16 w-16 rounded-full object-cover"
-              />
-            )}
             <div>
               <h1 className="text-2xl font-bold">{user.name ?? "Seller"}</h1>
               <div className="mt-1 flex items-center gap-2">
@@ -45,7 +38,7 @@ export default function SellerPage() {
               </div>
               {avgRating != null && (
                 <p className="text-muted-foreground">
-                  {avgRating.toFixed(1)} stars ({reviewsReceived.length} reviews)
+                  {avgRating.toFixed(1)} / 5 ({reviewsReceived.length} reviews)
                 </p>
               )}
             </div>

@@ -11,17 +11,21 @@ import {
   Bell,
   ArrowRightLeft,
   Flag,
+  Trophy,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/", label: "Marketplace", icon: BookOpen },
+  { href: "/marketplace", label: "Marketplace", icon: BookOpen },
   { href: "/dashboard/listings", label: "My Listings", icon: List },
   { href: "/dashboard/orders", label: "Orders", icon: ArrowRightLeft },
   { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
-  { href: "/", label: "Auctions", icon: Gavel },
+  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/auctions", label: "Auctions", icon: Gavel },
 ] as const;
 
 export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
@@ -42,7 +46,7 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
           const Icon = item.icon;
           const isActive =
             pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+            pathname.startsWith(`${item.href}/`);
           return (
             <Link
               key={item.href + item.label}

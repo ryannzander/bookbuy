@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Bell, Search, Settings } from "lucide-react";
 import type { User } from "@/types/entities";
 
@@ -34,13 +35,13 @@ export function DashboardHeader({
             </span>
           )}
         </button>
-        <button
-          type="button"
+        <Link
+          href="/settings"
           aria-label="Settings"
           className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
         >
           <Settings className="h-4 w-4" />
-        </button>
+        </Link>
         <div className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-sm font-semibold text-primary">
           {user.name?.[0] ?? user.email[0] ?? "?"}
         </div>

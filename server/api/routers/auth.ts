@@ -13,13 +13,13 @@ export const authRouter = createTRPCRouter({
           name: input.name ?? null,
           avatarUrl: input.avatarUrl ?? null,
           username: input.email.split("@")[0],
-          verified: input.email.endsWith(".edu"),
+          verified: input.email.endsWith(".utschools.ca"),
         },
         update: {
           email: input.email,
           name: input.name ?? undefined,
           avatarUrl: input.avatarUrl ?? undefined,
-          verified: input.email.endsWith(".edu"),
+          verified: input.email.endsWith(".utschools.ca"),
         },
       });
       return { ok: true };
@@ -47,4 +47,5 @@ export const authRouter = createTRPCRouter({
         },
       });
     }),
+
 });

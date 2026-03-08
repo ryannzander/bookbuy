@@ -38,8 +38,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         username: (me.name ?? me.email.split("@")[0]).toLowerCase(),
         email: me.email,
         avatarUrl: me.avatarUrl ?? null,
-        schoolName: null,
-        verified: true,
+        schoolName: me.schoolName ?? null,
+        verified: me.verified,
         createdAt: me.createdAt.toISOString(),
       }
     : fallbackUser;

@@ -28,7 +28,14 @@ export const listingRouter = createTRPCRouter({
       const listing = await ctx.db.listing.findUnique({
         where: { id: input.id },
         include: {
-          seller: { select: { id: true, name: true, avatarUrl: true } },
+          seller: {
+            select: {
+              id: true,
+              name: true,
+              avatarUrl: true,
+              reviewsReceived: { select: { rating: true } },
+            },
+          },
           bids: { orderBy: { amount: "desc" }, include: { user: { select: { id: true, name: true } } } },
         },
       });
@@ -89,7 +96,13 @@ export const listingRouter = createTRPCRouter({
         where,
         orderBy,
         include: {
-          seller: { select: { id: true, name: true } },
+          seller: {
+            select: {
+              id: true,
+              name: true,
+              reviewsReceived: { select: { rating: true } },
+            },
+          },
           bids: { orderBy: { amount: "desc" }, take: 1 },
         },
       });
@@ -115,10 +128,10 @@ export const listingRouter = createTRPCRouter({
         where: { id: ctx.userId },
         select: { verified: true, email: true },
       });
-      if (!user || (!user.verified && !user.email.endsWith(".edu"))) {
+      if (!user || (!user.verified && !user.email.endsWith(".utschools.ca"))) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Verified school account required to create listings",
+          message: "A .utschools.ca account is required to create listings",
         });
       }
       if (input.type === "AUCTION" && !input.auctionEndsAt) {

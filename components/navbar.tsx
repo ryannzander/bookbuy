@@ -27,7 +27,7 @@ export function Navbar() {
           BookBuy
         </Link>
         <nav className="flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/marketplace" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Marketplace
           </Link>
           {isLoggedIn ? (
