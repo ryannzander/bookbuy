@@ -1,25 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #0f172a;
-  --primary-foreground: #f8fafc;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #dc2626;
-  --destructive-foreground: #fafafa;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #0f172a;
+  /* Bold dark theme - default */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --popover: #0a0a0a;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #171717;
+  --secondary-foreground: #ffffff;
+  --muted: #171717;
+  --muted-foreground: #a1a1a1;
+  --accent: #171717;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: #22c55e;
+  --success-foreground: #000000;
+  --warning: #f59e0b;
+  --warning-foreground: #000000;
+  --border: #262626;
+  --input: #262626;
+  --ring: #ffffff;
+  --radius: 0.75rem;
 }
 
 @theme inline {
@@ -39,45 +45,63 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
-    --popover: #1e293b;
-    --popover-foreground: #f1f5f9;
-    --primary: #f8fafc;
-    --primary-foreground: #0f172a;
-    --secondary: #334155;
-    --secondary-foreground: #f8fafc;
-    --muted: #334155;
-    --muted-foreground: #94a3b8;
-    --accent: #334155;
-    --accent-foreground: #f8fafc;
-    --destructive: #b91c1c;
-    --destructive-foreground: #fafafa;
-    --border: #334155;
-    --input: #334155;
-    --ring: #94a3b8;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent browser autofill blue/yellow backgrounds on dark forms */
+/* Selection styling */
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Prevent browser autofill styling override */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -89,32 +113,42 @@ textarea:-webkit-autofill:focus {
   transition: background-color 9999s ease-out 0s;
 }
 
-/* Dashboard dark theme */
-.dashboard-theme {
-  --background: #1a1a1a;
-  --foreground: #fafafa;
-  --card: #242424;
-  --card-foreground: #fafafa;
-  --popover: #242424;
-  --popover-foreground: #fafafa;
-  --primary: #4ade80;
-  --primary-foreground: #1a1a1a;
-  --secondary: #2a2a2a;
-  --secondary-foreground: #fafafa;
-  --muted: #2e2e2e;
-  --muted-foreground: #a3a3a3;
-  --accent: #2a2a2a;
-  --accent-foreground: #fafafa;
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #2e2e2e;
-  --input: #2e2e2e;
-  --ring: #4ade80;
-  --dash-bg: #1a1a1a;
-  --dash-card: #242424;
-  --dash-accent: #4ade80;
-  --dash-accent-dim: #22c55e;
-  --dash-text: #ffffff;
-  --dash-muted: #a3a3a3;
-  --dash-border: #2e2e2e;
+/* Focus visible styling */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for interactive elements */
+a, button, input, textarea, select {
+  transition: all 0.15s ease;
+}
+
+/* Typography utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(to right, #ffffff, #a1a1a1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle glow effect for cards */
+.glow {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }

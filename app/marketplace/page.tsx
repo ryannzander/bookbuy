@@ -6,8 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { BookOpen, Filter, Search, Star, X } from "lucide-react";
 
 const CONDITIONS = ["Like New", "Good", "Acceptable", "Worn"];
 const SORT_OPTIONS = [
@@ -18,18 +18,23 @@ const SORT_OPTIONS = [
 
 function MarketplaceContent() {
   const searchParams = useSearchParams();
+  const [showFilters, setShowFilters] = useState(false);
   const [subject, setSubject] = useState(searchParams.get("subject") ?? "");
-  const [courseCode, setCourseCode] = useState(searchParams.get("courseCode") ?? "");
-  const [condition, setCondition] = useState(searchParams.get("condition") ?? "");
+  const [courseCode, setCourseCode] = useState(
+    searchParams.get("courseCode") ?? ""
+  );
+  const [condition, setCondition] = useState(
+    searchParams.get("condition") ?? ""
+  );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
   const [type, setType] = useState<"FIXED" | "AUCTION" | "">(
     (searchParams.get("type") as "FIXED" | "AUCTION") ?? ""
   );
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
-  const [availability, setAvailability] = useState<"available" | "sold" | "all">(
-    (searchParams.get("availability") as "available" | "sold" | "all") ?? "available"
-  );
+  const [availability, setAvailability] = useState<
+    "available" | "sold" | "all"
+  >((searchParams.get("availability") as "available" | "sold" | "all") ?? "available");
   const [sort, setSort] = useState<"newest" | "priceAsc" | "priceDesc">(
     (searchParams.get("sort") as "newest" | "priceAsc" | "priceDesc") ?? "newest"
   );
@@ -75,53 +80,101 @@ function MarketplaceContent() {
 
   const applyFilters = () => updateUrl();
 
+  const clearFilters = () => {
+    setSubject("");
+    setCourseCode("");
+    setCondition("");
+    setMinPrice("");
+    setMaxPrice("");
+    setType("");
+    setSearch("");
+    setAvailability("available");
+    setSort("newest");
+    window.history.replaceState(null, "", window.location.pathname);
+  };
+
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
+  const hasActiveFilters =
+    subject || courseCode || condition || minPrice || maxPrice || type || search;
+
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Marketplace</h1>
-        <p className="mt-1 text-muted-foreground">Find textbooks from students at your school</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+            Marketplace
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Find textbooks from students at your school
+          </p>
+        </div>
+        <Link href="/listings/new">
+          <Button size="lg">Sell a Book</Button>
+        </Link>
       </div>
 
-      <Card className="border-border/60">
-        <CardHeader className="pb-3">
-          <Label className="text-sm font-semibold text-foreground">Filters</Label>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search by title, author, or ISBN..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyFilters()}
+            className="pl-12 h-14 text-base"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => setShowFilters(!showFilters)}
+          className="gap-2 h-14"
+        >
+          <Filter className="h-5 w-5" />
+          Filters
+          {hasActiveFilters && (
+            <span className="h-2 w-2 rounded-full bg-foreground" />
+          )}
+        </Button>
+      </div>
+
+      {/* Filters Panel */}
+      {showFilters && (
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-foreground">Filters</h3>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-2">
+                <X className="h-4 w-4" />
+                Clear all
+              </Button>
+            )}
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="search">Search</Label>
+              <Label>Subject</Label>
               <Input
-                id="search"
-                placeholder="Title, author, ISBN"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input
-                id="subject"
                 placeholder="e.g. Math, Biology"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="courseCode">Course code</Label>
+              <Label>Course Code</Label>
               <Input
-                id="courseCode"
                 placeholder="MATH 221"
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="condition">Condition</Label>
+              <Label>Condition</Label>
               <select
-                id="condition"
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
               >
@@ -136,7 +189,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Type</Label>
               <select
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
                 value={type}
                 onChange={(e) => setType(e.target.value as "FIXED" | "AUCTION" | "")}
               >
@@ -148,9 +201,11 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Availability</Label>
               <select
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
                 value={availability}
-                onChange={(e) => setAvailability(e.target.value as "available" | "sold" | "all")}
+                onChange={(e) =>
+                  setAvailability(e.target.value as "available" | "sold" | "all")
+                }
               >
                 <option value="available">Available</option>
                 <option value="sold">Sold</option>
@@ -158,9 +213,8 @@ function MarketplaceContent() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minPrice">Min price ($)</Label>
+              <Label>Min Price ($)</Label>
               <Input
-                id="minPrice"
                 type="number"
                 min={0}
                 step={0.01}
@@ -169,9 +223,8 @@ function MarketplaceContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="maxPrice">Max price ($)</Label>
+              <Label>Max Price ($)</Label>
               <Input
-                id="maxPrice"
                 type="number"
                 min={0}
                 step={0.01}
@@ -182,9 +235,11 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Sort</Label>
               <select
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
                 value={sort}
-                onChange={(e) => setSort(e.target.value as "newest" | "priceAsc" | "priceDesc")}
+                onChange={(e) =>
+                  setSort(e.target.value as "newest" | "priceAsc" | "priceDesc")
+                }
               >
                 {SORT_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -194,83 +249,124 @@ function MarketplaceContent() {
               </select>
             </div>
           </div>
-          <Button onClick={applyFilters} className="mt-1 w-full sm:w-auto">
-            Apply filters
-          </Button>
-        </CardContent>
-      </Card>
 
+          <Button onClick={applyFilters} className="w-full sm:w-auto">
+            Apply Filters
+          </Button>
+        </div>
+      )}
+
+      {/* Results */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <p className="text-muted-foreground">Loading listings…</p>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+            Loading listings...
+          </div>
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border bg-muted/30 py-12 text-center">
-          <p className="text-muted-foreground">No listings match your filters.</p>
-          <p className="mt-1 text-sm text-muted-foreground">Try adjusting or clearing filters.</p>
+        <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 py-16 text-center">
+          <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+          <p className="text-lg font-semibold text-foreground">No listings found</p>
+          <p className="mt-2 text-muted-foreground">
+            Try adjusting or clearing your filters
+          </p>
         </div>
       ) : (
         <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((listing) => (
-              <Link key={listing.id} href={`/listings/${listing.id}`} className="group">
-                <Card className="h-full transition-all duration-200 hover:shadow-md hover:border-border group-hover:bg-card">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium bg-primary/20 text-primary">
-                        {listing.type === "AUCTION" ? "Auction" : "Buy now"}
-                      </span>
-                      {listing.type === "AUCTION" && listing.bids?.[0] && (
-                        <span className="text-xs font-medium text-muted-foreground">
-                          ${Number(listing.bids[0].amount)} bid
-                        </span>
-                      )}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((listing) => {
+              const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
+              const sellerAvgRating =
+                sellerReviewCount > 0
+                  ? listing.seller.reviewsReceived.reduce(
+                      (sum, review) => sum + review.rating,
+                      0
+                    ) / sellerReviewCount
+                  : null;
+
+              return (
+                <Link
+                  key={listing.id}
+                  href={`/listings/${listing.id}`}
+                  className="group"
+                >
+                  <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-muted-foreground/30 transition-all duration-200">
+                    {/* Image placeholder */}
+                    <div className="aspect-[4/3] bg-secondary flex items-center justify-center">
+                      <BookOpen className="h-12 w-12 text-muted-foreground/30" />
                     </div>
-                    <h2 className="mt-2 font-semibold leading-snug text-foreground group-hover:text-primary">
-                      {listing.title}
-                    </h2>
-                    <p className="text-sm text-muted-foreground">{listing.author}</p>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <p className="text-lg font-semibold text-foreground">
-                      ${Number(listing.price)}
-                      {listing.type === "AUCTION" && (
-                        <span className="text-sm font-normal text-muted-foreground"> starting bid</span>
-                      )}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {listing.condition} · {listing.subject}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="pt-0">
-                    {(() => {
-                      const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
-                      const sellerAvgRating =
-                        sellerReviewCount > 0
-                          ? listing.seller.reviewsReceived.reduce((sum, review) => sum + review.rating, 0) /
-                            sellerReviewCount
-                          : null;
-                      return (
-                        <span className="text-xs text-muted-foreground">
-                          by {listing.seller.name ?? "Seller"} ·{" "}
-                          {sellerAvgRating != null ? `${sellerAvgRating.toFixed(1)} / 5` : "No ratings yet"}
+
+                    {/* Content */}
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            listing.type === "AUCTION"
+                              ? "bg-warning/20 text-warning"
+                              : "bg-secondary text-foreground"
+                          }`}
+                        >
+                          {listing.type === "AUCTION" ? "Auction" : "Buy Now"}
                         </span>
-                      );
-                    })()}
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
+                        {listing.type === "AUCTION" && listing.bids?.[0] && (
+                          <span className="text-xs font-medium text-muted-foreground">
+                            ${Number(listing.bids[0].amount)} bid
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="mt-3 font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-muted-foreground transition-colors">
+                        {listing.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {listing.author}
+                      </p>
+
+                      <div className="mt-4 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-foreground">
+                          ${Number(listing.price)}
+                        </span>
+                        {listing.type === "AUCTION" && (
+                          <span className="text-xs text-muted-foreground">
+                            starting bid
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{listing.condition}</span>
+                        <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                        <span>{listing.subject}</span>
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          {listing.seller.name ?? "Seller"}
+                        </span>
+                        {sellerAvgRating != null && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Star className="h-3 w-3 fill-current" />
+                            {sellerAvgRating.toFixed(1)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+
           {hasNextPage && (
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center pt-8">
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
               >
-                {isFetchingNextPage ? "Loading…" : "Load more"}
+                {isFetchingNextPage ? "Loading..." : "Load More"}
               </Button>
             </div>
           )}
@@ -282,7 +378,16 @@ function MarketplaceContent() {
 
 export default function MarketplacePage() {
   return (
-    <Suspense fallback={<p className="text-muted-foreground">Loading marketplace…</p>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+            Loading marketplace...
+          </div>
+        </div>
+      }
+    >
       <MarketplaceContent />
     </Suspense>
   );
