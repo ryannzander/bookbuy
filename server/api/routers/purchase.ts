@@ -1,0 +1,65 @@
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { ListingStatus, ListingType } from "@prisma/client";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createNotification } from "@/server/api/notifications";
+
+export const purchaseRouter = createTRPCRouter({
+  purchase: protectedProcedure
+    .input(z.object({ listingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const listing = await ctx.db.listing.findUnique({
+        where: { id: input.listingId },
+        include: { seller: true },
+      });
+      if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
+      if (listing.status !== ListingStatus.AVAILABLE) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Listing is not available" });
+      }
+      if (listing.type !== ListingType.FIXED) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Use bids for auctions" });
+      }
+      if (listing.sellerId === ctx.userId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot buy your own listing" });
+      }
+      const [purchase] = await ctx.db.$transaction([
+        ctx.db.purchase.create({
+          data: {
+            listingId: listing.id,
+            buyerId: ctx.userId,
+            finalPrice: listing.price,
+          },
+        }),
+        ctx.db.listing.update({
+          where: { id: listing.id },
+          data: { status: ListingStatus.SOLD },
+        }),
+      ]);
+      await createNotification(ctx.db, {
+        userId: listing.sellerId,
+        type: "SALE",
+        title: "Your listing was purchased",
+        body: `Someone bought "${listing.title}". Arrange in-person payment.`,
+        linkUrl: `/dashboard`,
+      });
+      await createNotification(ctx.db, {
+        userId: ctx.userId,
+        type: "PURCHASE",
+        title: "Purchase confirmed",
+        body: `You bought "${listing.title}". Contact seller to arrange payment. Leave a review after you're done!`,
+        linkUrl: `/dashboard`,
+      });
+      return purchase;
+    }),
+
+  myPurchases: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.purchase.findMany({
+      where: { buyerId: ctx.userId },
+      include: {
+        listing: { include: { seller: { select: { id: true, name: true } } } },
+        review: true,
+      },
+      orderBy: { purchasedAt: "desc" },
+    });
+  }),
+});

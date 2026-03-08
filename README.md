@@ -1,6 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BookBuy – School Book Exchange
 
-## Getting Started
+A T3-style book exchange for schools: list textbooks, buy/sell, leave reviews, and run auctions. Built with Next.js, Supabase (Postgres + Auth), Prisma, tRPC, shadcn/ui, and Tailwind.
+
+## Setup
+
+1. **Copy environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+2. **Supabase** – Create a project at [supabase.com](https://supabase.com). In **Settings → API**: copy the project URL and anon key into `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. In **Settings → Database**: copy the connection string (URI) into `DATABASE_URL`.
+3. **Auth redirect** – In Supabase **Authentication → URL Configuration**, set Site URL to `http://localhost:3000` (dev) and add `http://localhost:3000/auth/callback` to Redirect URLs. For production, add your Vercel URL and `https://<your-app>.vercel.app/auth/callback`.
+4. **Database**
+   ```bash
+   npm run db:push
+   ```
+5. **Run the app**
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Deploy on Vercel
+
+- In the Vercel project, set **Environment Variables**: `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Use the same Supabase connection string for `DATABASE_URL` (e.g. from **Settings → Database**; pooler connection is fine).
+- After first deploy, run migrations from your machine with `npm run db:push` (or use Supabase migrations). Optional: add a [Vercel Cron Job](https://vercel.com/docs/cron-jobs) that calls an API route to resolve ended auctions.
+
+## Getting Started (dev)
 
 First, run the development server:
 

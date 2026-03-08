@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id
+  email     String
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings     Listing[]
+  purchases    Purchase[]     @relation("Buyer")
+  reviewsGiven Review[]      @relation("ReviewAuthor")
+  reviewsReceived Review[]   @relation("ReviewReceiver")
+  bids         Bid[]
+  notifications Notification[]
+}
+
+model Listing {
+  id            String   @id @default(cuid())
+  sellerId      String
+  seller        User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  title         String
+  author        String
+  isbn          String
+  condition     String
+  subject       String
+  price         Decimal  @db.Decimal(10, 2)
+  type          ListingType
+  auctionEndsAt DateTime?
+  status        ListingStatus @default(AVAILABLE)
+  imageUrls     String?   // JSON array of URLs or single URL
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  purchases Purchase[]
+  bids      Bid[]
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Decimal @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+}
+
+enum ListingType {
+  FIXED
+  AUCTION
+}
+
+enum ListingStatus {
+  AVAILABLE
+  SOLD
+  AUCTION_ENDED
+}
+
+model Purchase {
+  id           String   @id @default(cuid())
+  listingId    String
+  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId      String
+  buyer        User     @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  finalPrice   Decimal  @db.Decimal(10, 2)
+  purchasedAt  DateTime @default(now())
+
+  review Review?
+
+  @@unique([listingId])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  purchaseId String
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  sellerId   String
+  seller     User     @relation("ReviewReceiver", fields: [sellerId], references: [id], onDelete: Cascade)
+  buyerId    String
+  buyer      User     @relation("ReviewAuthor", fields: [buyerId], references: [id], onDelete: Cascade)
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@unique([purchaseId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  linkUrl   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
