@@ -9,7 +9,7 @@ import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Star, ArrowLeft } from "lucide-react";
 
 const schema = z.object({
   rating: z.coerce.number().min(1).max(5),
@@ -37,71 +37,119 @@ export default function LeaveReviewPage() {
   });
 
   function onSubmit(values: FormData) {
-    createReview.mutate({ purchaseId, rating: values.rating, comment: values.comment });
+    createReview.mutate({
+      purchaseId,
+      rating: values.rating,
+      comment: values.comment,
+    });
   }
 
   if (!purchases) {
-    return <p className="text-muted-foreground">Loading…</p>;
-  }
-  if (!purchase) {
     return (
-      <div>
-        <p>Purchase not found.</p>
-        <Link href="/dashboard"><Button variant="outline" className="mt-4">Back to dashboard</Button></Link>
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="h-4 w-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+        Loading...
       </div>
     );
   }
+
+  if (!purchase) {
+    return (
+      <div className="max-w-md mx-auto text-center py-12">
+        <p className="text-foreground font-semibold">Purchase not found.</p>
+        <Link href="/dashboard">
+          <Button variant="outline" className="mt-6 gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to dashboard
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
   if (purchase.review) {
     return (
-      <div>
-        <p>You already left a review for this purchase.</p>
-        <Link href="/dashboard"><Button variant="outline" className="mt-4">Back to dashboard</Button></Link>
+      <div className="max-w-md mx-auto text-center py-12">
+        <p className="text-foreground font-semibold">
+          You already left a review for this purchase.
+        </p>
+        <Link href="/dashboard">
+          <Button variant="outline" className="mt-6 gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to dashboard
+          </Button>
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <Card>
-        <CardHeader>
-          <CardTitle>Leave a review</CardTitle>
-          <CardDescription>
-            Rate your experience buying &quot;{purchase.listing.title}&quot; from {purchase.listing.seller?.name ?? "the seller"}.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="rating">Rating (1–5 stars)</Label>
-              <Input
-                id="rating"
-                type="number"
-                min={1}
-                max={5}
-                {...form.register("rating")}
-              />
-              {form.formState.errors.rating && (
-                <p className="text-sm text-destructive">{form.formState.errors.rating.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="comment">Comment (optional)</Label>
-              <Input id="comment" {...form.register("comment")} placeholder="How did it go?" />
-            </div>
-            {createReview.error && (
-              <p className="text-sm text-destructive">{createReview.error.message}</p>
+    <div className="max-w-lg mx-auto">
+      <div className="rounded-2xl border border-border bg-card p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center">
+            <Star className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Leave a Review</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Rate your experience buying &quot;{purchase.listing.title}&quot;
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="rating" className="text-foreground">
+              Rating (1-5 stars)
+            </Label>
+            <Input
+              id="rating"
+              type="number"
+              min={1}
+              max={5}
+              {...form.register("rating")}
+            />
+            {form.formState.errors.rating && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.rating.message}
+              </p>
             )}
-            <div className="flex gap-2">
-              <Button type="submit" disabled={createReview.isPending}>
-                {createReview.isPending ? "Submitting…" : "Submit review"}
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="comment" className="text-foreground">
+              Comment (optional)
+            </Label>
+            <Input
+              id="comment"
+              {...form.register("comment")}
+              placeholder="How did it go?"
+            />
+          </div>
+
+          {createReview.error && (
+            <p className="text-sm text-destructive">
+              {createReview.error.message}
+            </p>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="submit"
+              disabled={createReview.isPending}
+              className="flex-1"
+            >
+              {createReview.isPending ? "Submitting..." : "Submit Review"}
+            </Button>
+            <Link href="/dashboard">
+              <Button type="button" variant="outline">
+                Cancel
               </Button>
-              <Link href="/dashboard">
-                <Button type="button" variant="outline">Cancel</Button>
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

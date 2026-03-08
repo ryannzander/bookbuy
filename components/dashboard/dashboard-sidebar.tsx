@@ -13,6 +13,7 @@ import {
   Flag,
   Trophy,
   Settings,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,40 +23,44 @@ const navItems = [
   { href: "/dashboard/listings", label: "My Listings", icon: List },
   { href: "/dashboard/orders", label: "Orders", icon: ArrowRightLeft },
   { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
-  { href: "/settings", label: "Settings", icon: Settings },
-  { href: "/auctions", label: "Auctions", icon: Gavel },
 ] as const;
 
 export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 shrink-0 flex flex-col border-r border-border bg-background">
-      <div className="p-6">
-        <Link href="/" className="text-xl font-bold text-foreground tracking-tight flex items-center gap-3">
-          <span className="h-8 w-8 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center">
-            <BookOpen className="h-4 w-4" />
+    <aside className="w-64 shrink-0 flex flex-col border-r border-border bg-card">
+      {/* Logo */}
+      <div className="p-6 border-b border-border">
+        <Link
+          href="/"
+          className="text-xl font-bold text-foreground tracking-tight flex items-center gap-3"
+        >
+          <span className="h-10 w-10 rounded-xl bg-foreground text-background inline-flex items-center justify-center">
+            <BookOpen className="h-5 w-5" />
           </span>
-          BuyBook
+          <span>BookBuy</span>
         </Link>
       </div>
-      <nav className="flex-1 px-3 space-y-0.5">
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            pathname === item.href ||
-            pathname.startsWith(`${item.href}/`);
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <Link
-              key={item.href + item.label}
+              key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-card text-primary border border-border"
-                  : "text-muted-foreground hover:bg-card hover:text-foreground"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
               )}
             >
               <Icon className="h-5 w-5 shrink-0" />
@@ -64,31 +69,56 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
           );
         })}
       </nav>
-      <div className="p-3">
+
+      {/* Bottom Section */}
+      <div className="p-3 space-y-2 border-t border-border">
+        {/* Notifications */}
         <Link
           href="/notifications"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
+          className={cn(
+            "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+            pathname === "/notifications"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          )}
         >
           <Bell className="h-5 w-5 shrink-0" />
           Notifications
           {unreadCount > 0 && (
-            <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
-              {unreadCount > 9 ? "9+" : unreadCount}
+            <span className="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-destructive px-2 text-xs font-bold text-destructive-foreground">
+              {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
         </Link>
+
+        {/* Settings */}
+        <Link
+          href="/settings"
+          className={cn(
+            "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+            pathname === "/settings"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          )}
+        >
+          <Settings className="h-5 w-5 shrink-0" />
+          Settings
+        </Link>
       </div>
+
+      {/* CTA Card */}
       <div className="p-4">
-        <div className="rounded-2xl bg-card border border-border p-4">
-          <p className="text-sm font-semibold text-foreground">Create a new listing</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Post your textbook and connect with students looking for your course materials.
+        <div className="rounded-2xl bg-secondary border border-border p-5">
+          <h3 className="text-base font-bold text-foreground">Sell a Textbook</h3>
+          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+            List your textbook and connect with students at your school.
           </p>
           <Link
             href="/listings/new"
-            className="mt-3 flex items-center justify-center rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-colors"
+            className="mt-4 flex items-center justify-center gap-2 rounded-full bg-foreground px-4 py-3 text-sm font-semibold text-background hover:opacity-90 transition-all duration-200"
           >
-            List a Book
+            <Plus className="h-4 w-4" />
+            Create Listing
           </Link>
         </div>
       </div>

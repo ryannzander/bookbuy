@@ -1,64 +1,130 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy } from "lucide-react";
+import { Trophy, Star, TrendingUp, BookOpen, Shield } from "lucide-react";
 import { api } from "@/lib/trpc/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export default function LeaderboardPage() {
   const { data, isLoading } = api.seller.getLeaderboard.useQuery({ limit: 20 });
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading leaderboard...</p>;
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+          Loading leaderboard...
+        </div>
+      </div>
+    );
   }
 
   const rows = data ?? [];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Top Sellers Leaderboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Ranked by review quality, completed sales, and reputation.
+    <div className="mx-auto max-w-4xl space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-foreground text-background mb-4">
+          <Trophy className="h-8 w-8" />
+        </div>
+        <h1 className="text-3xl font-bold text-foreground">Top Sellers</h1>
+        <p className="mt-2 text-muted-foreground max-w-md mx-auto">
+          Ranked by review quality, completed sales, and reputation
         </p>
       </div>
 
       {rows.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-muted-foreground">
-            No leaderboard data yet.
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No leaderboard data yet"
+          description="Start selling to appear on the leaderboard."
+        />
       ) : (
-        <div className="space-y-3">
-          {rows.map((seller, index) => (
-            <Card key={seller.id} className={index < 3 ? "border-primary/40" : ""}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center justify-between gap-3">
-                  <span className="flex items-center gap-3">
-                    <span className="inline-flex h-8 min-w-[32px] items-center justify-center rounded-lg bg-primary/15 px-2 text-sm font-bold text-primary">
-                      #{index + 1}
-                    </span>
-                    <Link href={`/sellers/${seller.id}`} className="hover:text-primary">
-                      {seller.name ?? "Seller"}
-                    </Link>
-                    {seller.verified && (
-                      <span className="rounded-md bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                        Verified
+        <div className="space-y-4">
+          {rows.map((seller, index) => {
+            const isTop3 = index < 3;
+            const rankColors = [
+              "bg-yellow-500/20 text-yellow-500",
+              "bg-gray-300/20 text-gray-300",
+              "bg-amber-600/20 text-amber-600",
+            ];
+
+            return (
+              <div
+                key={seller.id}
+                className={`rounded-2xl border bg-card p-6 transition-all duration-200 hover:border-muted-foreground/30 ${
+                  isTop3 ? "border-foreground/30" : "border-border"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  {/* Rank */}
+                  <div
+                    className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 ${
+                      isTop3
+                        ? rankColors[index]
+                        : "bg-secondary text-muted-foreground"
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+
+                  {/* Avatar */}
+                  <div className="h-14 w-14 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-bold shrink-0">
+                    {seller.name?.[0]?.toUpperCase() ?? "S"}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link
+                        href={`/sellers/${seller.id}`}
+                        className="text-lg font-semibold text-foreground hover:underline"
+                      >
+                        {seller.name ?? "Seller"}
+                      </Link>
+                      {seller.verified && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">
+                          <Shield className="h-3 w-3" />
+                          Verified
+                        </span>
+                      )}
+                      {index === 0 && (
+                        <Trophy className="h-5 w-5 text-yellow-500" />
+                      )}
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <Star className="h-4 w-4 fill-current text-foreground" />
+                        <span className="font-medium text-foreground">
+                          {seller.averageRating.toFixed(1)}
+                        </span>
+                        / 5
                       </span>
-                    )}
-                  </span>
-                  {index === 0 && <Trophy className="h-4 w-4 text-primary" />}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground grid gap-2 sm:grid-cols-4">
-                <p>Rating: {seller.averageRating.toFixed(1)} / 5</p>
-                <p>Reviews: {seller.reviewCount}</p>
-                <p>Sales: {seller.salesCount}</p>
-                <p>Active listings: {seller.activeListings}</p>
-              </CardContent>
-            </Card>
-          ))}
+                      <span className="flex items-center gap-1.5">
+                        <TrendingUp className="h-4 w-4" />
+                        {seller.salesCount} sales
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <BookOpen className="h-4 w-4" />
+                        {seller.activeListings} active
+                      </span>
+                      <span>{seller.reviewCount} reviews</span>
+                    </div>
+                  </div>
+
+                  {/* View Profile */}
+                  <Link
+                    href={`/sellers/${seller.id}`}
+                    className="hidden sm:inline-flex rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
+                  >
+                    View Profile
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

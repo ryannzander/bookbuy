@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
-import { Bell, Search, Settings } from "lucide-react";
+import { Bell, Search, Settings, LogOut } from "lucide-react";
 import type { User } from "@/types/entities";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function DashboardHeader({
   user,
@@ -9,50 +18,112 @@ export function DashboardHeader({
   user: User;
   unreadCount: number;
 }) {
+  const initials = user.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : user.email[0].toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[#2e2e2e] bg-[#1a1a1a]/95 backdrop-blur px-3 sm:px-4 md:px-6">
-      <div className="hidden sm:flex flex-1 items-center gap-3 max-w-lg">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a3a3a3]" />
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/80 backdrop-blur-xl px-4 sm:px-6 lg:px-8">
+      {/* Search */}
+      <div className="hidden sm:flex flex-1 items-center max-w-xl">
+        <div className="relative w-full">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="search"
-            placeholder="Search books, course codes, sellers..."
-            className="w-full rounded-xl border border-[#2e2e2e] bg-[#242424] py-2 pl-9 pr-4 text-sm text-white placeholder:text-[#a3a3a3] focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] transition-colors"
+            placeholder="Search books, courses, sellers..."
+            className="w-full h-11 rounded-full border-2 border-border bg-card pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none transition-all duration-200"
           />
         </div>
       </div>
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
+
+      {/* Right side actions */}
+      <div className="ml-auto flex items-center gap-3">
+        {/* Mobile search */}
         <button
           type="button"
+          aria-label="Search"
+          className="sm:hidden h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all duration-200"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+
+        {/* Notifications */}
+        <Link
+          href="/notifications"
           aria-label="Notifications"
-          className="relative h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
+          className="relative h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all duration-200"
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
-        </button>
+        </Link>
+
+        {/* Settings */}
         <Link
           href="/settings"
           aria-label="Settings"
-          className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
+          className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all duration-200"
         >
           <Settings className="h-4 w-4" />
         </Link>
-        <div className="hidden sm:flex h-9 w-9 rounded-full bg-card border border-border items-center justify-center text-sm font-semibold text-primary">
-          {user.name?.[0] ?? user.email[0] ?? "?"}
-        </div>
-        <div className="hidden sm:block">
-          <p className="text-sm font-semibold text-foreground">
-            {user.name ?? "User"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {user.verified ? "Verified Student Seller" : "Student Seller"}
-          </p>
-        </div>
+
+        {/* User Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-3 rounded-full bg-card border border-border pl-1 pr-4 py-1 hover:border-muted-foreground transition-all duration-200">
+              <div className="h-8 w-8 rounded-full bg-foreground text-background flex items-center justify-center text-sm font-bold">
+                {initials}
+              </div>
+              <div className="hidden sm:block text-left">
+                <p className="text-sm font-semibold text-foreground leading-tight">
+                  {user.name ?? "User"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {user.verified ? "Verified" : "Student"}
+                </p>
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="px-3 py-2">
+              <p className="text-sm font-semibold text-foreground">
+                {user.name ?? "User"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard" className="cursor-pointer">
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="cursor-pointer">
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/auth/signout"
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

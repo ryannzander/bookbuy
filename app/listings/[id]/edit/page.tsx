@@ -10,24 +10,31 @@ import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Edit } from "lucide-react";
 
-const schema = z.object({
-  title: z.string().min(1, "Title required"),
-  courseCode: z.string().optional(),
-  author: z.string().min(1, "Author required"),
-  isbn: z.string().min(1, "ISBN required"),
-  condition: z.string().min(1, "Condition required"),
-  subject: z.string().min(1, "Subject required"),
-  edition: z.string().optional(),
-  description: z.string().optional(),
-  price: z.coerce.number().positive("Price must be positive"),
-  type: z.enum(["FIXED", "AUCTION"]),
-  auctionEndsAt: z.string().optional(),
-}).refine(
-  (data) => data.type !== "AUCTION" || (data.auctionEndsAt && new Date(data.auctionEndsAt) > new Date()),
-  { message: "Auction must have an end date in the future", path: ["auctionEndsAt"] }
-);
+const schema = z
+  .object({
+    title: z.string().min(1, "Title required"),
+    courseCode: z.string().optional(),
+    author: z.string().min(1, "Author required"),
+    isbn: z.string().min(1, "ISBN required"),
+    condition: z.string().min(1, "Condition required"),
+    subject: z.string().min(1, "Subject required"),
+    edition: z.string().optional(),
+    description: z.string().optional(),
+    price: z.coerce.number().positive("Price must be positive"),
+    type: z.enum(["FIXED", "AUCTION"]),
+    auctionEndsAt: z.string().optional(),
+  })
+  .refine(
+    (data) =>
+      data.type !== "AUCTION" ||
+      (data.auctionEndsAt && new Date(data.auctionEndsAt) > new Date()),
+    {
+      message: "Auction must have an end date in the future",
+      path: ["auctionEndsAt"],
+    }
+  );
 
 type FormData = z.infer<typeof schema>;
 
@@ -76,7 +83,7 @@ export default function EditListingPage() {
         ? new Date(listing.auctionEndsAt).toISOString().slice(0, 16)
         : "",
     });
-  }, [listing, id, router]);
+  }, [listing, id, router, form]);
 
   const update = api.listing.update.useMutation({
     onSuccess: () => {
@@ -88,14 +95,32 @@ export default function EditListingPage() {
     update.mutate({
       id,
       ...values,
-      auctionEndsAt: values.auctionEndsAt ? new Date(values.auctionEndsAt) : undefined,
+      auctionEndsAt: values.auctionEndsAt
+        ? new Date(values.auctionEndsAt)
+        : undefined,
     });
   }
 
-  if (isLoading || !listing) {
+  if (isLoading) {
     return (
-      <div className="py-8">
-        {isLoading ? <p className="text-muted-foreground">Loading…</p> : <p>Listing not found.</p>}
+      <div className="flex items-center justify-center py-20">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-lg font-semibold text-foreground">Listing not found</p>
+        <Link href="/marketplace">
+          <Button variant="outline" className="mt-4">
+            Back to Marketplace
+          </Button>
+        </Link>
       </div>
     );
   }
@@ -105,78 +130,131 @@ export default function EditListingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg">
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit listing</CardTitle>
-          <CardDescription>Update your textbook listing.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
+    <div className="mx-auto max-w-2xl">
+      {/* Header */}
+      <div className="mb-8">
+        <Link
+          href={`/listings/${id}`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to listing
+        </Link>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-foreground text-background flex items-center justify-center">
+            <Edit className="h-7 w-7" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Edit Listing</h1>
+            <p className="text-muted-foreground">Update your textbook listing</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form */}
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="title">Title</Label>
               <Input id="title" {...form.register("title")} />
               {form.formState.errors.title && (
-                <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.title.message}
+                </p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="author">Author</Label>
               <Input id="author" {...form.register("author")} />
               {form.formState.errors.author && (
-                <p className="text-sm text-destructive">{form.formState.errors.author.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.author.message}
+                </p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="courseCode">Course code (optional)</Label>
-              <Input id="courseCode" {...form.register("courseCode")} />
-            </div>
+
             <div className="space-y-2">
               <Label htmlFor="isbn">ISBN</Label>
               <Input id="isbn" {...form.register("isbn")} />
               {form.formState.errors.isbn && (
-                <p className="text-sm text-destructive">{form.formState.errors.isbn.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.isbn.message}
+                </p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="condition">Condition</Label>
-              <Input id="condition" {...form.register("condition")} />
-              {form.formState.errors.condition && (
-                <p className="text-sm text-destructive">{form.formState.errors.condition.message}</p>
-              )}
-            </div>
+
             <div className="space-y-2">
               <Label htmlFor="subject">Subject</Label>
               <Input id="subject" {...form.register("subject")} />
               {form.formState.errors.subject && (
-                <p className="text-sm text-destructive">{form.formState.errors.subject.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.subject.message}
+                </p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="courseCode">Course Code (optional)</Label>
+              <Input id="courseCode" {...form.register("courseCode")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="condition">Condition</Label>
+              <select
+                id="condition"
+                {...form.register("condition")}
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
+              >
+                <option value="">Select condition</option>
+                <option value="Like New">Like New</option>
+                <option value="Good">Good</option>
+                <option value="Acceptable">Acceptable</option>
+                <option value="Worn">Worn</option>
+              </select>
+              {form.formState.errors.condition && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.condition.message}
+                </p>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="edition">Edition (optional)</Label>
               <Input id="edition" {...form.register("edition")} />
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="description">Description (optional)</Label>
               <textarea
                 id="description"
                 {...form.register("description")}
-                rows={3}
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                rows={4}
+                className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all resize-none"
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="price">Price ($)</Label>
-              <Input id="price" type="number" step={0.01} {...form.register("price")} />
+              <Input
+                id="price"
+                type="number"
+                step={0.01}
+                {...form.register("price")}
+              />
               {form.formState.errors.price && (
-                <p className="text-sm text-destructive">{form.formState.errors.price.message}</p>
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.price.message}
+                </p>
               )}
             </div>
+
             <div className="space-y-2">
-              <Label>Listing type</Label>
+              <Label>Listing Type</Label>
               <input type="hidden" {...form.register("type")} />
               <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
                 value={type}
                 onChange={(e) => {
                   const v = e.target.value as "FIXED" | "AUCTION";
@@ -184,37 +262,49 @@ export default function EditListingPage() {
                   form.setValue("type", v);
                 }}
               >
-                <option value="FIXED">Buy now (fixed price)</option>
+                <option value="FIXED">Buy Now (Fixed Price)</option>
                 <option value="AUCTION">Auction</option>
               </select>
             </div>
+
             {type === "AUCTION" && (
-              <div className="space-y-2">
-                <Label htmlFor="auctionEndsAt">Auction end (date & time)</Label>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="auctionEndsAt">Auction End Date & Time</Label>
                 <Input
                   id="auctionEndsAt"
                   type="datetime-local"
                   {...form.register("auctionEndsAt")}
                 />
                 {form.formState.errors.auctionEndsAt && (
-                  <p className="text-sm text-destructive">{form.formState.errors.auctionEndsAt.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.auctionEndsAt.message}
+                  </p>
                 )}
               </div>
             )}
-            {update.error && (
-              <p className="text-sm text-destructive">{update.error.message}</p>
-            )}
-            <div className="flex gap-2">
-              <Button type="submit" disabled={update.isPending}>
-                {update.isPending ? "Saving…" : "Save changes"}
+          </div>
+
+          {update.error && (
+            <p className="text-sm text-destructive">{update.error.message}</p>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={update.isPending}
+              className="flex-1 sm:flex-none"
+            >
+              {update.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+            <Link href={`/listings/${id}`}>
+              <Button type="button" variant="outline" size="lg">
+                Cancel
               </Button>
-              <Link href={`/listings/${id}`}>
-                <Button type="button" variant="outline">Cancel</Button>
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

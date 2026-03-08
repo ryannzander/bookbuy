@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { AppShell } from "@/components/app-shell";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BuyBook – School Book Exchange",
-  description: "List, buy, and sell textbooks at your school.",
+  title: "BookBuy | The Marketplace for Student Textbooks",
+  description: "Buy and sell textbooks with students at your school. Save money, reduce waste, connect with your campus community.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -26,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
         <TRPCProvider>
           <AppShell>{children}</AppShell>
         </TRPCProvider>

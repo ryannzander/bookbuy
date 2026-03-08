@@ -8,12 +8,14 @@ export function EmptyState({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#2e2e2e] bg-[#242424]/50 p-10 text-center">
-      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#1a1a1a]">
-        <Inbox className="h-5 w-5 text-[#a3a3a3]" />
+    <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 p-10 text-center">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+        <Inbox className="h-6 w-6 text-muted-foreground" />
       </div>
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-      <p className="mt-1 text-sm text-[#a3a3a3]">{description}</p>
+      <h3 className="text-base font-semibold text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+        {description}
+      </p>
     </div>
   );
 }
