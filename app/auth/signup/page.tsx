@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 function isAllowedSchoolEmail(value: string) {
   const email = value.trim().toLowerCase();
-  return /^[^@\s]+@([a-z0-9-]+\.)*utschools\.ca$/.test(email);
+  return /^[^@\s]+@utschools\.ca$/.test(email);
 }
 
 export default function SignupPage() {
@@ -28,7 +28,7 @@ export default function SignupPage() {
     setError(null);
     const normalizedEmail = email.trim().toLowerCase();
     if (!isAllowedSchoolEmail(normalizedEmail)) {
-      setError("You must sign up with a .utschools.ca email address.");
+      setError("You must sign up with a @utschools.ca email address.");
       return;
     }
     setLoading(true);
@@ -96,14 +96,14 @@ export default function SignupPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@school.utschools.ca"
+                placeholder="you@utschools.ca"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                pattern="^[^@\s]+@([a-zA-Z0-9-]+\.)*utschools\.ca$"
+                pattern="^[^@\s]+@utschools\.ca$"
               />
               <p className="text-xs text-muted-foreground">
-                Use your school email (.utschools.ca) to get a verified seller badge.
+                Use your school email (@utschools.ca) to get a verified seller badge.
               </p>
             </div>
             <div className="space-y-2">

@@ -33,7 +33,7 @@ export default function LandingPage() {
             <p className="text-sm font-semibold text-foreground">Why students use BookBuy</p>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li className="rounded-xl border border-border/70 bg-card px-3 py-2">
-                Verified `.utschools.ca` accounts only
+                Verified `@utschools.ca` accounts only
               </li>
               <li className="rounded-xl border border-border/70 bg-card px-3 py-2">
                 In-app messages and meetup scheduling
@@ -53,7 +53,7 @@ export default function LandingPage() {
         <div className="rounded-2xl border border-border bg-card p-5">
           <p className="text-sm font-semibold text-foreground">1. Sign up with school email</p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Create your account with a valid `.utschools.ca` email to join the marketplace.
+            Create your account with a valid `@utschools.ca` email to join the marketplace.
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">

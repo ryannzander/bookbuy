@@ -4,6 +4,10 @@ import { ListingType, ListingStatus, type Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "@/server/api/trpc";
 import { resolveAuctionIfEnded } from "@/server/api/auction";
 
+function isUTSchoolsEmail(email: string) {
+  return email.toLowerCase().endsWith("@utschools.ca");
+}
+
 const listingCreateInput = z.object({
   title: z.string().min(1),
   courseCode: z.string().optional(),
@@ -128,10 +132,10 @@ export const listingRouter = createTRPCRouter({
         where: { id: ctx.userId },
         select: { verified: true, email: true },
       });
-      if (!user || (!user.verified && !user.email.endsWith(".utschools.ca"))) {
+      if (!user || (!user.verified && !isUTSchoolsEmail(user.email))) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "A .utschools.ca account is required to create listings",
+          message: "A @utschools.ca account is required to create listings",
         });
       }
       if (input.type === "AUCTION" && !input.auctionEndsAt) {
