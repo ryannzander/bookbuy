@@ -49,8 +49,8 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="mx-auto max-w-sm py-8 dashboard-theme">
-        <Card className="shadow-md">
+      <div className="dashboard-theme min-h-screen bg-background px-4 py-10">
+        <Card className="mx-auto max-w-sm shadow-md">
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
@@ -70,8 +70,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm py-8 dashboard-theme">
-      <Card className="shadow-md">
+    <div className="dashboard-theme min-h-screen bg-background px-4 py-10">
+      <Card className="mx-auto max-w-sm shadow-md">
         <CardHeader>
           <CardTitle>Sign up</CardTitle>
           <CardDescription>Create a BuyBook account</CardDescription>

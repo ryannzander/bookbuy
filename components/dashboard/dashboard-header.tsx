@@ -11,8 +11,8 @@ export function DashboardHeader({
 }) {
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-[#2e2e2e] bg-[#1a1a1a]/95 backdrop-blur px-6">
-      <div className="flex-1 flex items-center gap-3 max-w-lg">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[#2e2e2e] bg-[#1a1a1a]/95 backdrop-blur px-3 sm:px-4 md:px-6">
+      <div className="hidden sm:flex flex-1 items-center gap-3 max-w-lg">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a3a3a3]" />
           <input
@@ -22,7 +22,7 @@ export function DashboardHeader({
           />
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <button
           type="button"
           aria-label="Notifications"
@@ -42,7 +42,7 @@ export function DashboardHeader({
         >
           <Settings className="h-4 w-4" />
         </Link>
-        <div className="h-9 w-9 rounded-full bg-card border border-border flex items-center justify-center text-sm font-semibold text-primary">
+        <div className="hidden sm:flex h-9 w-9 rounded-full bg-card border border-border items-center justify-center text-sm font-semibold text-primary">
           {user.name?.[0] ?? user.email[0] ?? "?"}
         </div>
         <div className="hidden sm:block">
