@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BookBuy | The Marketplace for Student Textbooks",
-  description: "Buy and sell textbooks with students at your school. Save money, reduce waste, connect with your campus community.",
+  title: "BuyBook – School Book Exchange",
+  description: "List, buy, and sell textbooks at your school.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
