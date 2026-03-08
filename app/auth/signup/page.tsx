@@ -74,7 +74,7 @@ export default function SignupPage() {
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Sign up</CardTitle>
-          <CardDescription>Create a BookBuy account</CardDescription>
+          <CardDescription>Create a BuyBook account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

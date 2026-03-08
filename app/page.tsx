@@ -10,10 +10,10 @@ export default function LandingPage() {
               Student-to-student textbook exchange
             </span>
             <h1 className="text-4xl font-black tracking-tight text-foreground md:text-5xl">
-              Buy and sell textbooks faster at UTSchools.
+              Buy and sell textbooks faster at UTS.
             </h1>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
-              BookBuy helps students list books, message sellers, schedule meetup exchanges, and
+              BuyBook helps students list books, message sellers, schedule meetup exchanges, and
               build trusted reputations with verified reviews.
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -30,7 +30,7 @@ export default function LandingPage() {
           </div>
 
           <div className="rounded-2xl border border-border bg-background/70 p-5">
-            <p className="text-sm font-semibold text-foreground">Why students use BookBuy</p>
+            <p className="text-sm font-semibold text-foreground">Why students use BuyBook</p>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li className="rounded-xl border border-border/70 bg-card px-3 py-2">
                 Verified `@utschools.ca` accounts only

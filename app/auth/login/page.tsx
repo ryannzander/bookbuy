@@ -38,7 +38,7 @@ function LoginForm() {
       <Card className="mx-auto max-w-sm shadow-md">
         <CardHeader>
           <CardTitle>Log in</CardTitle>
-          <CardDescription>Sign in to your BookBuy account</CardDescription>
+          <CardDescription>Sign in to your BuyBook account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

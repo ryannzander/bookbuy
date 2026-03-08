@@ -1,4 +1,4 @@
-# BookBuy – School Book Exchange
+# BuyBook – School Book Exchange
 
 A T3-style book exchange for schools: list textbooks, buy/sell, leave reviews, and run auctions. Built with Next.js, Supabase (Postgres + Auth), Prisma, tRPC, shadcn/ui, and Tailwind.
 

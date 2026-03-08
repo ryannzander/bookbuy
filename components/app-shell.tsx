@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     id: "guest",
     name: "Guest User",
     username: "guest",
-    email: "guest@bookbuy.local",
+    email: "guest@buybook.local",
     avatarUrl: null,
     schoolName: null,
     verified: false,
