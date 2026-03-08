@@ -76,3 +76,14 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Dashboard dark theme */
+.dashboard-theme {
+  --dash-bg: #1a1a1a;
+  --dash-card: #242424;
+  --dash-accent: #4ade80;
+  --dash-accent-dim: #22c55e;
+  --dash-text: #ffffff;
+  --dash-muted: #a3a3a3;
+  --dash-border: #2e2e2e;
+}
