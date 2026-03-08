@@ -38,7 +38,7 @@ export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
           <span className="h-8 w-8 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center">
             <BookOpen className="h-4 w-4" />
           </span>
-          BookBuy
+          BuyBook
         </Link>
       </div>
       <nav className="flex-1 px-3 space-y-0.5">

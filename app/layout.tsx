@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BookBuy – School Book Exchange",
+  title: "BuyBook – School Book Exchange",
   description: "List, buy, and sell textbooks at your school.",
 };
 
