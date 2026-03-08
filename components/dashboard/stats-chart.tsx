@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,8 +14,10 @@ import { EmptyState } from "@/components/shared/empty-state";
 export function StatsChart({ data }: { data: ActivityPoint[] }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-2xl bg-card border border-border p-5">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Marketplace activity</h3>
+      <div className="rounded-2xl bg-card border border-border p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
+          Marketplace Activity
+        </h3>
         <EmptyState
           title="No activity yet"
           description="Activity trends appear after your listings get views and sales."
@@ -25,30 +27,53 @@ export function StatsChart({ data }: { data: ActivityPoint[] }) {
   }
 
   return (
-    <div className="rounded-2xl bg-card border border-border p-5">
-      <h3 className="text-sm font-semibold text-foreground mb-4">Marketplace activity</h3>
-      <div className="h-56">
+    <div className="rounded-2xl bg-card border border-border p-6">
+      <h3 className="text-lg font-semibold text-foreground mb-6">
+        Marketplace Activity
+      </h3>
+      <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <XAxis dataKey="dateLabel" stroke="#737373" tickLine={false} axisLine={false} />
-            <YAxis hide domain={[0, "dataMax + 2"]} />
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="dateLabel"
+              stroke="#a1a1a1"
+              tickLine={false}
+              axisLine={false}
+              fontSize={12}
+              dy={10}
+            />
+            <YAxis
+              hide
+              domain={[0, "dataMax + 2"]}
+            />
             <Tooltip
               contentStyle={{
-                background: "rgba(36,36,36,1)",
-                border: "1px solid rgba(46,46,46,1)",
+                background: "#0a0a0a",
+                border: "1px solid #262626",
                 borderRadius: "12px",
-                color: "#fff",
+                color: "#ffffff",
+                fontSize: "14px",
+                padding: "12px 16px",
               }}
+              labelStyle={{ color: "#a1a1a1", marginBottom: "4px" }}
+              itemStyle={{ color: "#ffffff" }}
             />
-            <Line
+            <Area
               type="monotone"
               dataKey="views"
-              stroke="#4ade80"
-              strokeWidth={2.5}
-              dot={{ r: 3, fill: "#4ade80" }}
-              activeDot={{ r: 5, fill: "#86efac" }}
+              stroke="#ffffff"
+              strokeWidth={2}
+              fill="url(#viewsGradient)"
+              dot={{ r: 4, fill: "#000000", stroke: "#ffffff", strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: "#ffffff" }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>

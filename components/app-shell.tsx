@@ -12,10 +12,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isAuthRoute = pathname?.startsWith("/auth");
   const isApiRoute = pathname?.startsWith("/api");
   const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
-  const { data: unreadCount = 0 } = api.notification.unreadCount.useQuery(undefined, {
-    retry: false,
-    enabled: !!me,
-  });
+  const { data: unreadCount = 0 } = api.notification.unreadCount.useQuery(
+    undefined,
+    {
+      retry: false,
+      enabled: !!me,
+    }
+  );
 
   if (isAuthRoute || isApiRoute) {
     return <>{children}</>;
@@ -25,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     id: "guest",
     name: "Guest User",
     username: "guest",
-    email: "guest@buybook.local",
+    email: "guest@bookbuy.local",
     avatarUrl: null,
     schoolName: null,
     verified: false,
@@ -46,23 +49,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     : fallbackUser;
 
   return (
-    <div className="dashboard-theme min-h-screen flex bg-[#1a1a1a] text-white antialiased">
+    <div className="min-h-screen flex bg-background text-foreground antialiased">
       <div className="hidden lg:flex">
         <DashboardSidebar unreadCount={unreadCount} />
       </div>
       <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader user={user} unreadCount={unreadCount} />
-        <nav className="lg:hidden border-b border-border bg-background/95 px-3 py-2">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap">
-            <Link href="/dashboard" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Dashboard</Link>
-            <Link href="/marketplace" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Marketplace</Link>
-            <Link href="/dashboard/orders" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Orders</Link>
-            <Link href="/messages" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Messages</Link>
-            <Link href="/notifications" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Alerts {unreadCount > 0 ? `(${unreadCount})` : ""}</Link>
-            <Link href="/settings" className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground">Settings</Link>
+        <nav className="lg:hidden border-b border-border bg-card px-4 py-3">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            {[
+              { href: "/dashboard", label: "Dashboard" },
+              { href: "/marketplace", label: "Marketplace" },
+              { href: "/dashboard/orders", label: "Orders" },
+              { href: "/messages", label: "Messages" },
+              { href: "/notifications", label: `Alerts${unreadCount > 0 ? ` (${unreadCount})` : ""}` },
+              { href: "/settings", label: "Settings" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-full border px-4 py-2 text-xs font-medium transition-all ${
+                  pathname === item.href
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </nav>
-        <main className="flex-1 p-3 sm:p-4 md:p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
