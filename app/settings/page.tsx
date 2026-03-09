@@ -6,10 +6,22 @@ import { api } from "@/lib/trpc/client";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, Key, Mail, Settings, User } from "lucide-react";
+import Link from "next/link";
+import { Check, Key, Mail, Settings, User, Zap, CreditCard } from "lucide-react";
 
 function isUTSchoolsEmail(value: string) {
   return value.trim().toLowerCase().endsWith("@utschools.ca");
+}
+
+function BillingPortalButton() {
+  const openPortal = api.stripe.createBillingPortalSession.useMutation({
+    onSuccess: (d) => { if (d.url) window.location.href = d.url; },
+  });
+  return (
+    <Button variant="outline" size="sm" className="gap-2" onClick={() => openPortal.mutate()} disabled={openPortal.isPending}>
+      <CreditCard className="h-4 w-4" />{openPortal.isPending ? "Loading..." : "Manage billing"}
+    </Button>
+  );
 }
 
 export default function SettingsPage() {
@@ -56,6 +68,31 @@ export default function SettingsPage() {
               </span>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Plan & Billing */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center">
+            <Zap className="h-5 w-5 text-foreground" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">Plan & Billing</h3>
+            <p className="text-sm text-muted-foreground">
+              Your plan and subscription
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <span className={`text-sm font-medium px-3 py-1 rounded-full ${(me as { plan?: string })?.plan === "PRO" ? "bg-foreground text-background" : "bg-secondary text-muted-foreground"}`}>
+            {(me as { plan?: string })?.plan === "PRO" ? "Pro" : "Free"}
+          </span>
+          {(me as { plan?: string })?.plan === "PRO" ? (
+            <BillingPortalButton />
+          ) : (
+            <Link href="/pricing"><Button variant="secondary" size="sm" className="gap-2"><Zap className="h-4 w-4" />Upgrade to Pro</Button></Link>
+          )}
         </div>
       </div>
 

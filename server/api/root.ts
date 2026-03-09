@@ -14,6 +14,7 @@ import { wishlistRouter } from "@/server/api/routers/wishlist";
 import { adminRouter } from "@/server/api/routers/admin";
 import { courseRouter } from "@/server/api/routers/course";
 import { priceRouter } from "@/server/api/routers/price";
+import { stripeRouter } from "@/server/api/routers/stripe";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -31,6 +32,7 @@ export const appRouter = createTRPCRouter({
   admin: adminRouter,
   course: courseRouter,
   price: priceRouter,
+  stripe: stripeRouter,
 });
 
 export type AppRouter = typeof appRouter;

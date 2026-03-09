@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, BookOpen, List, MessageSquare, Gavel, Bell, ArrowRightLeft,
-  Flag, Trophy, Settings, Plus, Heart, GraduationCap, Shield,
+  Flag, Trophy, Settings, Plus, Heart, GraduationCap, Shield, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ const baseNavItems = [
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
+  { href: "/pricing", label: "Pricing", icon: Zap },
 ] as const;
 
 export function DashboardSidebar({
