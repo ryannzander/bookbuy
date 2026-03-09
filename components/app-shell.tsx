@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="hidden lg:flex"><DashboardSidebar unreadCount={unreadCount} /></div>
       <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader user={user} unreadCount={unreadCount} />
-        <nav className="lg:hidden border-b border-border bg-card px-4 py-3">
+        <nav className="lg:hidden border-b border-border/50 bg-card/50 backdrop-blur-sm px-4 py-3">
           <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
             {[
               { href: "/dashboard", label: "Dashboard" },
@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               { href: "/settings", label: "Settings" },
             ].map((item) => (
               <Link key={item.href} href={item.href}
-                className={`rounded-full border px-4 py-2 text-xs font-medium transition-all ${pathname === item.href ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground"}`}>
+                className={`rounded-full border px-4 py-2 text-xs font-medium transition-all ${pathname === item.href ? "border-primary/50 bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/20" : "border-border text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-secondary/50"}`}>
                 {item.label}
               </Link>
             ))}

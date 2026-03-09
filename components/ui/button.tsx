@@ -4,23 +4,25 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.97]",
   {
     variants: {
       variant: {
         default:
-          "bg-foreground text-background hover:bg-foreground/90 rounded-full",
+          "bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-sm hover:shadow-md",
+        primary:
+          "bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 rounded-full shadow-[0_4px_14px_0_rgba(139,92,246,0.4)] hover:shadow-[0_6px_20px_0_rgba(139,92,246,0.5)]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-sm",
         outline:
-          "border-2 border-border bg-transparent text-foreground hover:bg-foreground hover:text-background rounded-full",
+          "border border-border bg-transparent text-foreground hover:bg-secondary hover:border-primary/50 rounded-full",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-full",
         ghost:
-          "text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg",
-        link: "text-foreground underline-offset-4 hover:underline",
+          "text-foreground hover:bg-accent/50 hover:text-accent-foreground rounded-lg",
+        link: "text-primary underline-offset-4 hover:underline",
         success:
-          "bg-success text-success-foreground hover:bg-success/90 rounded-full",
+          "bg-success text-success-foreground hover:bg-success/90 rounded-full shadow-sm",
       },
       size: {
         default: "h-11 px-6 py-2",

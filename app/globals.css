@@ -1,31 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  /* Bold dark theme - default */
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #0a0a0a;
-  --card-foreground: #ffffff;
-  --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
-  --primary: #ffffff;
-  --primary-foreground: #000000;
-  --secondary: #171717;
-  --secondary-foreground: #ffffff;
-  --muted: #171717;
-  --muted-foreground: #a1a1a1;
-  --accent: #171717;
-  --accent-foreground: #ffffff;
+  /* Premium dark theme with indigo/violet accents */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #0c0c0f;
+  --card-foreground: #fafafa;
+  --popover: #0c0c0f;
+  --popover-foreground: #fafafa;
+  --primary: #8b5cf6;
+  --primary-foreground: #fafafa;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #6366f1;
+  --accent-foreground: #fafafa;
   --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #fafafa;
   --success: #22c55e;
-  --success-foreground: #000000;
+  --success-foreground: #09090b;
   --warning: #f59e0b;
-  --warning-foreground: #000000;
-  --border: #262626;
-  --input: #262626;
-  --ring: #ffffff;
+  --warning-foreground: #09090b;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #8b5cf6;
   --radius: 0.75rem;
+  
+  /* Extended palette for gradients and accents */
+  --violet-glow: rgba(139, 92, 246, 0.15);
+  --indigo-glow: rgba(99, 102, 241, 0.15);
+  --gradient-start: #8b5cf6;
+  --gradient-end: #6366f1;
+  --card-hover: #111114;
 }
 
 @theme inline {
@@ -61,34 +68,39 @@
 }
 
 .light {
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #09090b;
   --card: #ffffff;
   --card-foreground: #09090b;
   --popover: #ffffff;
   --popover-foreground: #09090b;
-  --primary: #09090b;
-  --primary-foreground: #ffffff;
+  --primary: #7c3aed;
+  --primary-foreground: #fafafa;
   --secondary: #f4f4f5;
   --secondary-foreground: #09090b;
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #09090b;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --accent: #4f46e5;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
   --success: #16a34a;
-  --success-foreground: #ffffff;
+  --success-foreground: #fafafa;
   --warning: #d97706;
-  --warning-foreground: #ffffff;
+  --warning-foreground: #fafafa;
   --border: #e4e4e7;
   --input: #e4e4e7;
-  --ring: #09090b;
+  --ring: #7c3aed;
+  --violet-glow: rgba(124, 58, 237, 0.1);
+  --indigo-glow: rgba(79, 70, 229, 0.1);
+  --gradient-start: #7c3aed;
+  --gradient-end: #4f46e5;
+  --card-hover: #f9f9fb;
 }
 
 .light ::selection {
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .light input:-webkit-autofill,
@@ -118,23 +130,23 @@ body {
 
 /* Selection styling */
 ::selection {
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -153,7 +165,7 @@ textarea:-webkit-autofill:focus {
   transition: background-color 9999s ease-out 0s;
 }
 
-/* Focus visible styling */
+/* Focus visible styling with violet ring */
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
@@ -161,7 +173,7 @@ textarea:-webkit-autofill:focus {
 
 /* Smooth transitions for interactive elements */
 a, button, input, textarea, select {
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Typography utilities */
@@ -173,22 +185,274 @@ a, button, input, textarea, select {
   text-wrap: pretty;
 }
 
-/* Gradient text utility */
+/* Premium gradient text */
 .gradient-text {
-  background: linear-gradient(to right, #ffffff, #a1a1a1);
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Subtle glow effect for cards */
+/* Subtle violet glow for premium elements */
 .glow {
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 40px var(--violet-glow), 0 0 80px var(--indigo-glow);
 }
 
-/* Glass morphism effect */
+.glow-sm {
+  box-shadow: 0 0 20px var(--violet-glow);
+}
+
+/* Glass morphism effects */
 .glass {
-  background: rgba(10, 10, 10, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(12, 12, 15, 0.8);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Premium gradient background */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+}
+
+/* Subtle gradient border */
+.gradient-border {
+  position: relative;
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* CSS Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--violet-glow);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--violet-glow), 0 0 60px var(--indigo-glow);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Staggered animation delays */
+.delay-75 { animation-delay: 75ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Shimmer loading effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--secondary) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Hover lift effect for cards */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--violet-glow);
+}
+
+.light .hover-lift:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 0 20px var(--violet-glow);
+}
+
+/* Image zoom on hover */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Active state indicator */
+.active-indicator {
+  position: relative;
+}
+
+.active-indicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
+  border-radius: 0 2px 2px 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.active-indicator.active::before {
+  opacity: 1;
+}
+
+/* Price badge styling */
+.price-badge {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: white;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px var(--violet-glow);
+}
+
+/* Condition indicator dots */
+.condition-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.condition-excellent { background: #22c55e; }
+.condition-good { background: #84cc16; }
+.condition-fair { background: #f59e0b; }
+.condition-poor { background: #ef4444; }
+
+/* Stats card gradient icons */
+.stats-icon {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: white;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px var(--violet-glow);
+}
+
+/* Form focus styles */
+.input-focus-glow:focus {
+  box-shadow: 0 0 0 3px var(--violet-glow);
+}
+
+/* Subtle noise texture overlay */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  mix-blend-mode: overlay;
 }

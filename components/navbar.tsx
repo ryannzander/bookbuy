@@ -33,24 +33,24 @@ export function Navbar() {
     : user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-3 text-xl font-bold text-foreground hover:opacity-80 transition-opacity"
+          className="group flex items-center gap-3 text-xl font-bold text-foreground transition-all"
         >
-          <span className="h-9 w-9 rounded-xl bg-foreground text-background inline-flex items-center justify-center">
+          <span className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground inline-flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
             <BookOpen className="h-4 w-4" />
           </span>
-          <span className="hidden sm:inline">BookBuy</span>
+          <span className="hidden sm:inline bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">BookBuy</span>
         </Link>
 
         {/* Navigation */}
         <nav className="flex items-center gap-2 sm:gap-4">
           <Link
             href="/marketplace"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
+            className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-4/5"
           >
             Marketplace
           </Link>
@@ -58,14 +58,14 @@ export function Navbar() {
           {isLoggedIn ? (
             <>
               <Link href="/listings/new">
-                <Button variant="outline" size="sm">
+                <Button variant="primary" size="sm">
                   Sell
                 </Button>
               </Link>
 
               <Link
                 href="/dashboard"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 hidden sm:block"
+                className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 hidden sm:block after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-4/5"
               >
                 Dashboard
               </Link>
@@ -73,11 +73,11 @@ export function Navbar() {
               {/* Notifications */}
               <Link
                 href="/notifications"
-                className="relative h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-muted-foreground transition-all"
+                className="relative h-10 w-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-secondary/80 transition-all"
               >
                 <Bell className="h-4 w-4" />
                 {unread != null && unread > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-primary to-accent px-1.5 text-[10px] font-bold text-primary-foreground animate-pulse">
                     {unread > 9 ? "9+" : unread}
                   </span>
                 )}
@@ -86,7 +86,7 @@ export function Navbar() {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center text-sm font-bold hover:opacity-90 transition-opacity">
+                  <button className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30">
                     {initials}
                   </button>
                 </DropdownMenuTrigger>
@@ -133,7 +133,7 @@ export function Navbar() {
                 </Button>
               </Link>
               <Link href="/auth/signup">
-                <Button size="sm">Sign up</Button>
+                <Button variant="primary" size="sm">Sign up</Button>
               </Link>
             </div>
           ) : null}
