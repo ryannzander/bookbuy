@@ -14,7 +14,10 @@ export default function PricingPage() {
   async function handleUpgrade() {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/stripe/subscription-checkout", { method: "POST" });
+      const res = await fetch("/api/stripe/subscription-checkout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Failed to create checkout");
       if (data.url) window.location.href = data.url;
