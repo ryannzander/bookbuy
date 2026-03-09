@@ -100,36 +100,6 @@ export const stripeRouter = createTRPCRouter({
       return { url: session.url!, sessionId: session.id };
     }),
 
-  createSubscriptionCheckout: protectedProcedure.mutation(async ({ ctx }) => {
-    const priceId = process.env.STRIPE_PRO_PRICE_ID;
-    if (!priceId) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Pro subscription is not configured. Set STRIPE_PRO_PRICE_ID.",
-      });
-    }
-
-    let customerId: string | null = null;
-    const user = await ctx.db.user.findUnique({
-      where: { id: ctx.userId },
-      select: { stripeCustomerId: true },
-    });
-    customerId = user?.stripeCustomerId ?? null;
-
-    const session = await getStripe().checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { type: "subscription", userId: ctx.userId },
-      customer: customerId ?? undefined,
-      customer_email: customerId ? undefined : (await ctx.db.user.findUnique({ where: { id: ctx.userId }, select: { email: true } }))?.email ?? undefined,
-      success_url: `${getBaseUrl()}/dashboard?pro=1`,
-      cancel_url: `${getBaseUrl()}/pricing`,
-    });
-
-    return { url: session.url!, sessionId: session.id };
-  }),
-
   createBillingPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.userId },
