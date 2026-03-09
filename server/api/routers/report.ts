@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
 
 export const reportRouter = createTRPCRouter({
-  create: protectedProcedure
+  create: sensitiveProcedure
     .input(
       z.object({
         targetUserId: z.string().optional(),

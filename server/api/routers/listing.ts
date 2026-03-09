@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ListingType, ListingStatus, type Prisma } from "@prisma/client";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
 import { resolveAuctionIfEnded } from "@/server/api/auction";
 
 function isUTSchoolsEmail(email: string) {
@@ -199,7 +199,7 @@ export const listingRouter = createTRPCRouter({
       });
     }),
 
-  delete: protectedProcedure
+  delete: sensitiveProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const listing = await ctx.db.listing.findUnique({ where: { id: input.id } });
@@ -249,7 +249,7 @@ export const listingRouter = createTRPCRouter({
       });
     }),
 
-  bulkDelete: protectedProcedure
+  bulkDelete: sensitiveProcedure
     .input(z.object({ ids: z.array(z.string()).min(1).max(50) }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.listing.deleteMany({ where: { id: { in: input.ids }, sellerId: ctx.userId } });
@@ -263,7 +263,11 @@ export const listingRouter = createTRPCRouter({
       return { ok: true };
     }),
 
-  archiveExpired: publicProcedure.mutation(async ({ ctx }) => {
+  archiveExpired: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({ where: { id: ctx.userId }, select: { role: true } });
+    if (user?.role !== "ADMIN") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+    }
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
     const result = await ctx.db.listing.updateMany({
       where: { status: "AVAILABLE", updatedAt: { lt: ninetyDaysAgo } },

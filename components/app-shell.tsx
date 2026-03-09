@@ -24,10 +24,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const fallbackUser: User = { id: "guest", name: "Guest User", username: "guest", email: "guest@buybook.local", avatarUrl: null, schoolName: null, verified: false, createdAt: new Date().toISOString() };
   const user: User = me ? { id: me.id, name: me.name ?? null, username: (me.name ?? me.email.split("@")[0]).toLowerCase(), email: me.email, avatarUrl: me.avatarUrl ?? null, schoolName: me.schoolName ?? null, verified: me.verified, createdAt: me.createdAt.toISOString() } : fallbackUser;
+  const isAdmin = (me as { role?: string } | undefined)?.role === "ADMIN";
 
   return (
     <div className="min-h-screen flex bg-background text-foreground antialiased">
-      <div className="hidden lg:flex"><DashboardSidebar unreadCount={unreadCount} /></div>
+      <div className="hidden lg:flex"><DashboardSidebar unreadCount={unreadCount} isAdmin={isAdmin} /></div>
       <div className="flex-1 flex flex-col min-w-0">
         <DashboardHeader user={user} unreadCount={unreadCount} />
         <nav className="lg:hidden border-b border-border/50 bg-card/50 backdrop-blur-sm px-4 py-3">
@@ -41,6 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               { href: "/courses", label: "Courses" },
               { href: "/notifications", label: `Alerts${unreadCount > 0 ? ` (${unreadCount})` : ""}` },
               { href: "/settings", label: "Settings" },
+              ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
             ].map((item) => (
               <Link key={item.href} href={item.href}
                 className={`rounded-full border px-4 py-2 text-xs font-medium transition-all ${pathname === item.href ? "border-primary/50 bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md shadow-primary/20" : "border-border text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-secondary/50"}`}>
