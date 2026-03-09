@@ -47,6 +47,13 @@ export const adminRouter = createTRPCRouter({
       });
     }),
   banUser: adminProcedure.input(z.object({ userId: z.string() })).mutation(async ({ ctx, input }) => {
+    if (input.userId === ctx.userId) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot restrict your own account." });
+    }
+    const target = await ctx.db.user.findUnique({ where: { id: input.userId }, select: { role: true } });
+    if (target?.role === "ADMIN") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Cannot restrict another admin." });
+    }
     await ctx.db.listing.updateMany({ where: { sellerId: input.userId, status: "AVAILABLE" }, data: { status: "SOLD" } });
     await ctx.db.notification.create({ data: { userId: input.userId, type: "ACCOUNT_BANNED", title: "Account Restricted", body: "Your account has been restricted by an administrator." } });
     return { ok: true };

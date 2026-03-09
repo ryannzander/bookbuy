@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, BookOpen, List, MessageSquare, Gavel, Bell, ArrowRightLeft,
-  Flag, Trophy, Settings, Plus, Heart, GraduationCap,
+  Flag, Trophy, Settings, Plus, Heart, GraduationCap, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+const baseNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/marketplace", label: "Marketplace", icon: BookOpen },
   { href: "/dashboard/listings", label: "My Listings", icon: List },
@@ -21,8 +21,18 @@ const navItems = [
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
 ] as const;
 
-export function DashboardSidebar({ unreadCount }: { unreadCount: number }) {
+export function DashboardSidebar({
+  unreadCount,
+  isAdmin = false,
+}: {
+  unreadCount: number;
+  isAdmin?: boolean;
+}) {
   const pathname = usePathname();
+  const navItems = [
+    ...baseNavItems,
+    ...(isAdmin ? [{ href: "/admin" as const, label: "Admin" as const, icon: Shield }] : []),
+  ];
 
   return (
     <aside className="w-64 shrink-0 flex flex-col border-r border-border bg-card">
