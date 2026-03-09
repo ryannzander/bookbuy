@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Check, Zap, Star } from "lucide-react";
@@ -7,10 +8,21 @@ import Link from "next/link";
 
 export default function PricingPage() {
   const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
-  const createCheckout = api.stripe.createSubscriptionCheckout.useMutation({
-    onSuccess: (data) => { if (data.url) window.location.href = data.url; },
-  });
+  const [isLoading, setIsLoading] = useState(false);
   const isPro = (me as { plan?: string } | undefined)?.plan === "PRO";
+
+  async function handleUpgrade() {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/stripe/subscription-checkout", { method: "POST" });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok) throw new Error(data.error ?? "Failed to create checkout");
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl py-12 px-4">
@@ -51,8 +63,8 @@ export default function PricingPage() {
           {isPro ? (
             <p className="mt-8 text-center text-sm text-muted-foreground">You&apos;re on Pro</p>
           ) : me ? (
-            <Button size="lg" className="w-full mt-8 gap-2" onClick={() => createCheckout.mutate()} disabled={createCheckout.isPending}>
-              {createCheckout.isPending ? "Loading..." : "Upgrade to Pro"}
+            <Button size="lg" className="w-full mt-8 gap-2" onClick={handleUpgrade} disabled={isLoading}>
+              {isLoading ? "Loading..." : "Upgrade to Pro"}
             </Button>
           ) : (
             <Link href="/auth/login?next=/pricing" className="mt-8 block"><Button size="lg" className="w-full">Sign in to upgrade</Button></Link>
