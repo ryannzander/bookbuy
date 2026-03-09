@@ -337,7 +337,7 @@ function MarketplaceContent() {
                   href={`/listings/${listing.id}`}
                   className="group"
                 >
-                  <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(139,92,246,0.05)] transition-all duration-300 hover-lift">
+                  <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(45,212,191,0.08)] transition-all duration-300 hover-lift">
                     <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden img-zoom">
                       {listing.imageUrls ? (() => { try { const imgs = JSON.parse(listing.imageUrls); return imgs[0] ? <img src={imgs[0]} alt={listing.title} className="h-full w-full object-cover transition-transform duration-500" /> : <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } catch { return <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } })() : <BookOpen className="h-12 w-12 text-muted-foreground/30" />}
                     </div>

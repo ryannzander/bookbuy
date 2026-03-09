@@ -14,7 +14,7 @@ export function MarketplaceListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(139,92,246,0.05)] transition-all duration-300 hover-lift block"
+      className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(45,212,191,0.08)] transition-all duration-300 hover-lift block"
     >
       <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden img-zoom">
         <BookOpen className="h-12 w-12 text-muted-foreground/30" />

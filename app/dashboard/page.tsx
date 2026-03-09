@@ -100,7 +100,7 @@ export default async function DashboardPage() {
               {data.recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="rounded-2xl bg-card border border-border p-5 flex items-center justify-between hover:border-primary/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08),0_0_10px_rgba(139,92,246,0.03)] transition-all duration-300"
+                  className="rounded-2xl bg-card border border-border p-5 flex items-center justify-between hover:border-primary/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08),0_0_10px_rgba(45,212,191,0.05)] transition-all duration-300"
                 >
                   <div>
                     <p className="font-semibold text-foreground">

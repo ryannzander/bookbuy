@@ -40,7 +40,7 @@ export function Navbar() {
           href="/"
           className="group flex items-center gap-3 text-xl font-bold text-foreground transition-all"
         >
-          <span className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground inline-flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
+          <span className="h-9 w-9 rounded-xl bg-primary/20 text-primary inline-flex items-center justify-center group-hover:bg-primary/30 transition-colors">
             <BookOpen className="h-4 w-4" />
           </span>
           <span className="hidden sm:inline bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">BookBuy</span>
@@ -86,7 +86,7 @@ export function Navbar() {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30">
+                  <button className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold hover:bg-primary/90 transition-all">
                     {initials}
                   </button>
                 </DropdownMenuTrigger>
