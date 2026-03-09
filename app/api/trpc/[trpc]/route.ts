@@ -62,6 +62,7 @@ const handler = async (req: Request) => {
     req,
     router: appRouter,
     createContext: () => createTRPCContext({ headers: req.headers }),
+    allowMethodOverride: true,
     onError: ({ error }) => {
       if (error.code === "INTERNAL_SERVER_ERROR") {
         console.error("tRPC internal error:", error.message);
