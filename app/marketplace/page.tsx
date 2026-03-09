@@ -48,14 +48,14 @@ function SearchAutocomplete({ value, onChange, onSubmit }: { value: string; onCh
         className="pl-12 h-14 text-base"
       />
       {open && results && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+        <div className="absolute top-full left-0 right-0 z-50 mt-2 rounded-xl border border-border bg-card/95 backdrop-blur-xl shadow-xl overflow-hidden animate-fade-in-down">
           {results.map((r) => (
-            <Link key={r.id} href={`/listings/${r.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-secondary transition-colors" onClick={() => setOpen(false)}>
+            <Link key={r.id} href={`/listings/${r.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-primary/10 transition-colors" onClick={() => setOpen(false)}>
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground text-sm truncate">{r.title}</p>
                 <p className="text-xs text-muted-foreground">{r.author}{r.courseCode ? ` · ${r.courseCode}` : ""}</p>
               </div>
-              <span className="text-sm font-bold text-foreground ml-3">${Number(r.price)}</span>
+              <span className="price-badge ml-3">${Number(r.price)}</span>
             </Link>
           ))}
         </div>
@@ -156,7 +156,7 @@ function MarketplaceContent() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 animate-fade-in">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
             Marketplace
@@ -166,7 +166,7 @@ function MarketplaceContent() {
           </p>
         </div>
         <Link href="/listings/new">
-          <Button size="lg">Sell a Book</Button>
+          <Button variant="primary" size="lg">Sell a Book</Button>
         </Link>
       </div>
 
@@ -189,7 +189,7 @@ function MarketplaceContent() {
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
+        <div className="rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-6 space-y-6 animate-fade-in-down">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-foreground">Filters</h3>
             {hasActiveFilters && (
@@ -220,7 +220,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Condition</Label>
               <select
-                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
+                className="flex h-12 w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/50 transition-all"
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
               >
@@ -235,7 +235,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Type</Label>
               <select
-                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
+                className="flex h-12 w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/50 transition-all"
                 value={type}
                 onChange={(e) => setType(e.target.value as "FIXED" | "AUCTION" | "")}
               >
@@ -247,7 +247,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Availability</Label>
               <select
-                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
+                className="flex h-12 w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/50 transition-all"
                 value={availability}
                 onChange={(e) =>
                   setAvailability(e.target.value as "available" | "sold" | "all")
@@ -281,7 +281,7 @@ function MarketplaceContent() {
             <div className="space-y-2">
               <Label>Sort</Label>
               <select
-                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
+                className="flex h-12 w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/50 transition-all"
                 value={sort}
                 onChange={(e) =>
                   setSort(e.target.value as "newest" | "priceAsc" | "priceDesc")
@@ -296,7 +296,7 @@ function MarketplaceContent() {
             </div>
           </div>
 
-          <Button onClick={applyFilters} className="w-full sm:w-auto">
+          <Button variant="primary" onClick={applyFilters} className="w-full sm:w-auto">
             Apply Filters
           </Button>
         </div>
@@ -337,9 +337,9 @@ function MarketplaceContent() {
                   href={`/listings/${listing.id}`}
                   className="group"
                 >
-                  <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-muted-foreground/30 transition-all duration-200">
-                    <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
-                      {listing.imageUrls ? (() => { try { const imgs = JSON.parse(listing.imageUrls); return imgs[0] ? <img src={imgs[0]} alt={listing.title} className="h-full w-full object-cover" /> : <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } catch { return <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } })() : <BookOpen className="h-12 w-12 text-muted-foreground/30" />}
+                  <div className="rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(139,92,246,0.05)] transition-all duration-300 hover-lift">
+                    <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden img-zoom">
+                      {listing.imageUrls ? (() => { try { const imgs = JSON.parse(listing.imageUrls); return imgs[0] ? <img src={imgs[0]} alt={listing.title} className="h-full w-full object-cover transition-transform duration-500" /> : <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } catch { return <BookOpen className="h-12 w-12 text-muted-foreground/30" />; } })() : <BookOpen className="h-12 w-12 text-muted-foreground/30" />}
                     </div>
 
                     {/* Content */}
@@ -348,8 +348,8 @@ function MarketplaceContent() {
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             listing.type === "AUCTION"
-                              ? "bg-warning/20 text-warning"
-                              : "bg-secondary text-foreground"
+                              ? "bg-gradient-to-r from-warning/20 to-warning/10 text-warning border border-warning/20"
+                              : "bg-gradient-to-r from-primary/20 to-accent/10 text-primary border border-primary/20"
                           }`}
                         >
                           {listing.type === "AUCTION" ? "Auction" : "Buy Now"}
@@ -361,7 +361,7 @@ function MarketplaceContent() {
                         )}
                       </div>
 
-                      <h3 className="mt-3 font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-muted-foreground transition-colors">
+                      <h3 className="mt-3 font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                         {listing.title}
                       </h3>
                       <p className="mt-1 text-sm text-muted-foreground">
@@ -369,7 +369,7 @@ function MarketplaceContent() {
                       </p>
 
                       <div className="mt-4 flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-foreground">
+                        <span className="text-2xl font-bold gradient-text">
                           ${Number(listing.price)}
                         </span>
                         {listing.type === "AUCTION" && (
@@ -380,17 +380,18 @@ function MarketplaceContent() {
                       </div>
 
                       <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className={`condition-dot ${listing.condition === 'Like New' ? 'condition-excellent' : listing.condition === 'Good' ? 'condition-good' : listing.condition === 'Acceptable' ? 'condition-fair' : 'condition-poor'}`} />
                         <span>{listing.condition}</span>
                         <span className="h-1 w-1 rounded-full bg-muted-foreground" />
                         <span>{listing.subject}</span>
                       </div>
 
-                      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                      <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">
                           {listing.seller.name ?? "Seller"}
                         </span>
                         {sellerAvgRating != null && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1 text-xs text-primary">
                             <Star className="h-3 w-3 fill-current" />
                             {sellerAvgRating.toFixed(1)}
                           </span>

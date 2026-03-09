@@ -34,17 +34,17 @@ export default async function DashboardPage() {
     <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
               Dashboard
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Welcome back, {data.user.name ?? data.user.email}
+              Welcome back, <span className="text-primary font-medium">{data.user.name ?? data.user.email}</span>
             </p>
           </div>
           <Link href="/listings/new">
-            <Button size="lg" className="gap-2">
+            <Button variant="primary" size="lg" className="gap-2">
               <Plus className="h-4 w-4" />
               Create Listing
             </Button>
@@ -100,18 +100,18 @@ export default async function DashboardPage() {
               {data.recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="rounded-2xl bg-card border border-border p-5 flex items-center justify-between hover:border-muted-foreground/30 transition-all"
+                  className="rounded-2xl bg-card border border-border p-5 flex items-center justify-between hover:border-primary/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08),0_0_10px_rgba(139,92,246,0.03)] transition-all duration-300"
                 >
                   <div>
                     <p className="font-semibold text-foreground">
                       {order.listingTitle ?? order.listingId}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ${order.priceAtPurchase} ·{" "}
+                      <span className="text-primary font-medium">${order.priceAtPurchase}</span> ·{" "}
                       {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <span className="rounded-full border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground">
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary">
                     {order.status}
                   </span>
                 </div>

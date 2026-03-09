@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, ArrowRight, Check, Mail } from "lucide-react";
+import { BookOpen, ArrowRight, Check, Mail, Sparkles } from "lucide-react";
 
 function isAllowedSchoolEmail(value: string) {
   const email = value.trim().toLowerCase();
@@ -69,12 +69,18 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md space-y-8">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 h-[400px] w-[400px] rounded-full bg-success/10 blur-[100px]" />
+          <div className="absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-primary/10 blur-[80px]" />
+        </div>
+
+        <div className="w-full max-w-md space-y-8 animate-fade-in-up">
           {/* Logo */}
           <div className="text-center">
-            <Link href="/" className="inline-flex items-center gap-3">
-              <span className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center">
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <span className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
                 <BookOpen className="h-6 w-6" />
               </span>
               <span className="text-2xl font-bold text-foreground">BuyBook</span>
@@ -82,8 +88,8 @@ export default function SignupPage() {
           </div>
 
           {/* Success Card */}
-          <div className="rounded-2xl border border-border bg-card p-8 text-center">
-            <div className="mx-auto h-16 w-16 rounded-full bg-success/20 flex items-center justify-center mb-6">
+          <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-8 text-center shadow-xl animate-scale-in">
+            <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center mb-6 animate-pulse-glow">
               <Mail className="h-8 w-8 text-success" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">
@@ -91,7 +97,7 @@ export default function SignupPage() {
             </h1>
             <p className="mt-3 text-muted-foreground">
               We sent a confirmation link to{" "}
-              <span className="font-medium text-foreground">{email}</span>
+              <span className="font-medium text-primary">{email}</span>
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               Click it to finish signing up.
@@ -108,21 +114,31 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 right-1/4 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/4 h-[300px] w-[300px] rounded-full bg-accent/10 blur-[80px]" />
+      </div>
+
+      <div className="w-full max-w-md space-y-8 animate-fade-in-up">
         {/* Logo */}
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <span className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center">
+          <Link href="/" className="inline-flex items-center gap-3 group">
+            <span className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
               <BookOpen className="h-6 w-6" />
             </span>
-              <span className="text-2xl font-bold text-foreground">BuyBook</span>
+            <span className="text-2xl font-bold text-foreground">BuyBook</span>
           </Link>
         </div>
 
         {/* Form Card */}
-        <div className="rounded-2xl border border-border bg-card p-8">
+        <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-8 shadow-xl">
           <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 mb-4">
+              <Sparkles className="h-3 w-3 text-primary" />
+              <span className="text-xs font-medium text-primary">Free forever</span>
+            </div>
             <h1 className="text-2xl font-bold text-foreground">
               Create your account
             </h1>
@@ -133,7 +149,7 @@ export default function SignupPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-4">
+              <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-4 animate-fade-in">
                 <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
@@ -160,7 +176,7 @@ export default function SignupPage() {
                 required
               />
               <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                <Check className="h-3 w-3 mt-0.5 shrink-0" />
+                <Check className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
                 <span>
                   Use your school email (@utschools.ca) to get verified seller status
                 </span>
@@ -182,13 +198,14 @@ export default function SignupPage() {
 
             <Button
               type="submit"
+              variant="primary"
               size="lg"
               className="w-full gap-2"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <div className="h-4 w-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                  <div className="h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                   Creating account...
                 </>
               ) : (
@@ -205,7 +222,7 @@ export default function SignupPage() {
               Already have an account?{" "}
               <Link
                 href="/auth/login"
-                className="font-medium text-foreground hover:underline"
+                className="font-medium text-primary hover:underline"
               >
                 Log in
               </Link>

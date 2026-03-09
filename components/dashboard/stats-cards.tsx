@@ -9,42 +9,48 @@ export function StatsCards({ stats }: { stats: DashboardStats }) {
       label: "Active Listings",
       value: stats.activeListings,
       icon: BookOpen,
-      change: null,
+      gradient: "from-primary/20 to-accent/10",
+      iconBg: "from-primary to-accent",
     },
     {
       label: "Books Sold",
       value: stats.booksSold,
       icon: TrendingUp,
-      change: null,
+      gradient: "from-success/20 to-success/5",
+      iconBg: "from-success to-success/80",
     },
     {
       label: "Seller Rating",
       value: stats.averageRating ? `${stats.averageRating.toFixed(1)}` : "N/A",
       icon: Star,
       suffix: stats.averageRating ? "/ 5" : "",
+      gradient: "from-warning/20 to-warning/5",
+      iconBg: "from-warning to-warning/80",
     },
     {
       label: "Pending",
       value: stats.pendingOrders,
       icon: Clock3,
-      change: null,
+      gradient: "from-accent/20 to-primary/5",
+      iconBg: "from-accent to-primary",
     },
   ];
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => {
+      {cards.map((card, index) => {
         const Icon = card.icon;
         return (
           <div
             key={card.label}
-            className="group rounded-2xl bg-card border border-border p-6 hover:border-muted-foreground/30 transition-all duration-200"
+            className={`group rounded-2xl bg-card border border-border p-6 hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(139,92,246,0.05)] transition-all duration-300 animate-fade-in-up`}
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
                 {card.label}
               </span>
-              <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-all duration-200">
+              <div className={`stats-icon bg-gradient-to-br ${card.iconBg}`}>
                 <Icon className="h-5 w-5" />
               </div>
             </div>
