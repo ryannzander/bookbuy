@@ -16,11 +16,9 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
-        // methodOverride: 'POST' sends ALL requests as POST; server must allow it
         httpLink({
           url: `${getBaseUrl()}/api/trpc`,
           transformer: superjson,
-          methodOverride: "POST",
         }),
       ],
     })
