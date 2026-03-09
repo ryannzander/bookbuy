@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { ListingType, ListingStatus, type Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
 import { resolveAuctionIfEnded } from "@/server/api/auction";
+import { FREE_LISTING_LIMIT } from "@/lib/monetization";
 
 function isUTSchoolsEmail(email: string) {
   return email.toLowerCase().endsWith("@utschools.ca");
@@ -94,7 +95,7 @@ export const listingRouter = createTRPCRouter({
           : input.sort === "priceDesc"
             ? { price: "desc" as const }
             : { createdAt: "desc" as const };
-      const items = await ctx.db.listing.findMany({
+      let items = await ctx.db.listing.findMany({
         take: input.limit + 1,
         cursor: input.cursor ? { id: input.cursor } : undefined,
         where,
@@ -110,6 +111,16 @@ export const listingRouter = createTRPCRouter({
           bids: { orderBy: { amount: "desc" }, take: 1 },
         },
       });
+      if (input.sort === "newest") {
+        const now = new Date();
+        items = items.sort((a, b) => {
+          const aFeat = a.featuredUntil && new Date(a.featuredUntil) > now;
+          const bFeat = b.featuredUntil && new Date(b.featuredUntil) > now;
+          if (aFeat && !bFeat) return -1;
+          if (!aFeat && bFeat) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      }
       let nextCursor: string | undefined;
       if (items.length > input.limit) {
         const next = items.pop();
@@ -130,13 +141,24 @@ export const listingRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { id: ctx.userId },
-        select: { verified: true, email: true },
+        select: { verified: true, email: true, plan: true },
       });
       if (!user || (!user.verified && !isUTSchoolsEmail(user.email))) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "A @utschools.ca account is required to create listings",
         });
+      }
+      if (user.plan === "FREE") {
+        const activeCount = await ctx.db.listing.count({
+          where: { sellerId: ctx.userId, status: ListingStatus.AVAILABLE },
+        });
+        if (activeCount >= FREE_LISTING_LIMIT) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `Free accounts can have up to ${FREE_LISTING_LIMIT} active listings. Upgrade to Pro for unlimited listings.`,
+          });
+        }
       }
       if (input.type === "AUCTION" && !input.auctionEndsAt) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Auction must have auctionEndsAt" });

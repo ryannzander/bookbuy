@@ -11,20 +11,28 @@ enum UserRole {
   ADMIN
 }
 
+enum UserPlan {
+  FREE
+  PRO
+}
+
 model User {
-  id           String   @id
-  email        String   @unique
-  username     String?  @unique
-  name         String?
-  avatarUrl    String?
-  schoolName   String?
-  verified     Boolean  @default(false)
-  role         UserRole @default(USER)
-  responseRate Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  onboarded    Boolean  @default(false)
-  lastActiveAt DateTime?
+  id                   String    @id
+  email                String    @unique
+  username             String?   @unique
+  name                 String?
+  avatarUrl            String?
+  schoolName           String?
+  verified             Boolean   @default(false)
+  responseRate         Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  role                 UserRole  @default(USER)
+  onboarded            Boolean   @default(false)
+  lastActiveAt         DateTime?
+  plan                 UserPlan  @default(FREE)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
 
   sellerProfile    SellerProfile?
   listings         Listing[]
@@ -62,6 +70,7 @@ model Listing {
   status        ListingStatus @default(AVAILABLE)
   imageUrls     String?
   isFeatured    Boolean       @default(false)
+  featuredUntil DateTime?
   viewCount     Int           @default(0)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -117,10 +126,12 @@ model Purchase {
   buyer        User           @relation("Buyer", fields: [buyerId], references: [id], onDelete: Cascade)
   sellerId     String
   seller       User           @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
-  status       PurchaseStatus @default(PENDING)
-  finalPrice   Decimal        @db.Decimal(10, 2)
-  meetupDate   DateTime?
-  purchasedAt  DateTime       @default(now())
+  status           PurchaseStatus @default(PENDING)
+  finalPrice       Decimal        @db.Decimal(10, 2)
+  platformFeeCents Int           @default(0)
+  stripePaymentId  String?
+  meetupDate       DateTime?
+  purchasedAt      DateTime       @default(now())
 
   review Review?
   meetup Meetup?

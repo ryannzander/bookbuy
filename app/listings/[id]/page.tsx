@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  BookOpen, Clock, Edit, Flag, Heart, MessageSquare, ShoppingCart, Star,
-  Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check,
+  BookOpen, Clock, CreditCard, Edit, Flag, Heart, MessageSquare, ShoppingCart, Star,
+  Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check, Zap,
 } from "lucide-react";
 
 function formatEndsAt(auctionEndsAt: Date | null) {
@@ -50,6 +50,8 @@ export default function ListingDetailPage() {
   const wishlistToggle = api.wishlist.toggle.useMutation({ onSuccess: () => utils.wishlist.isSaved.invalidate({ listingId: id }) });
   const setAlert = api.price.setAlert.useMutation({ onSuccess: () => { utils.price.getAlert.invalidate({ listingId: id }); setAlertPrice(""); } });
   const removeAlert = api.price.removeAlert.useMutation({ onSuccess: () => utils.price.getAlert.invalidate({ listingId: id }) });
+  const purchaseCheckout = api.stripe.createPurchaseCheckout.useMutation({ onSuccess: (d) => { if (d.url) window.location.href = d.url; } });
+  const boostCheckout = api.stripe.createBoostCheckout.useMutation({ onSuccess: (d) => { if (d.url) window.location.href = d.url; } });
 
   function handleShare() {
     const url = window.location.href;
@@ -147,7 +149,15 @@ export default function ListingDetailPage() {
             {isAuction && endsAtLabel && <div className={`flex items-center gap-2 ${hasEnded ? "text-muted-foreground" : "text-warning"}`}><Clock className="h-5 w-5" /><span className="font-medium">{endsAtLabel}</span></div>}
 
             <div className="space-y-3">
-              {isAvailable && listing.type === "FIXED" && !isOwner && <Button size="lg" className="w-full gap-2" onClick={() => purchaseMutation.mutate({ listingId: id })} disabled={purchaseMutation.isPending}><ShoppingCart className="h-5 w-5" />{purchaseMutation.isPending ? "Processing..." : "Buy Now"}</Button>}
+              {isAvailable && listing.type === "FIXED" && !isOwner && (
+                <>
+                  <div className="flex gap-2">
+                    <Button size="lg" className="flex-1 gap-2" onClick={() => purchaseMutation.mutate({ listingId: id })} disabled={purchaseMutation.isPending}><ShoppingCart className="h-5 w-5" />{purchaseMutation.isPending ? "..." : "Pay in person"}</Button>
+                    <Button size="lg" variant="secondary" className="flex-1 gap-2" onClick={() => purchaseCheckout.mutate({ listingId: id })} disabled={purchaseCheckout.isPending}><CreditCard className="h-5 w-5" />{purchaseCheckout.isPending ? "..." : "Pay with card"}</Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center">Card payments include a small platform fee; seller receives the rest.</p>
+                </>
+              )}
               {isAvailable && isAuction && !hasEnded && !isOwner && (
                 <div className="space-y-3">
                   <div className="space-y-2"><Label>Place a bid (min ${minBid.toFixed(2)})</Label><div className="flex gap-2"><Input type="number" min={minBid} step={0.01} value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder={minBid.toFixed(2)} /><Button onClick={() => bidMutation.mutate({ listingId: id, amount: Number(bidAmount) })} disabled={!bidAmount || Number(bidAmount) < minBid || bidMutation.isPending}>{bidMutation.isPending ? "..." : "Bid"}</Button></div></div>
@@ -161,10 +171,13 @@ export default function ListingDetailPage() {
                 </div>
               )}
               {isOwner && isAvailable && (
-                <div className="flex gap-2">
-                  <Link href={`/listings/${id}/edit`} className="flex-1"><Button variant="outline" size="lg" className="w-full gap-2"><Edit className="h-5 w-5" /> Edit</Button></Link>
-                  <Button variant="destructive" size="lg" className="gap-2" onClick={() => { if (confirm("Delete this listing?")) deleteMutation.mutate({ id }); }} disabled={deleteMutation.isPending}><Trash2 className="h-5 w-5" />{deleteMutation.isPending ? "..." : "Delete"}</Button>
-                </div>
+                <>
+                  <div className="flex gap-2">
+                    <Link href={`/listings/${id}/edit`} className="flex-1"><Button variant="outline" size="lg" className="w-full gap-2"><Edit className="h-5 w-5" /> Edit</Button></Link>
+                    <Button variant="destructive" size="lg" className="gap-2" onClick={() => { if (confirm("Delete this listing?")) deleteMutation.mutate({ id }); }} disabled={deleteMutation.isPending}><Trash2 className="h-5 w-5" />{deleteMutation.isPending ? "..." : "Delete"}</Button>
+                  </div>
+                  <Button variant="outline" size="lg" className="w-full gap-2" onClick={() => boostCheckout.mutate({ listingId: id })} disabled={boostCheckout.isPending}><Zap className="h-5 w-5" />{boostCheckout.isPending ? "..." : "Boost listing ($2.99 for 14 days)"}</Button>
+                </>
               )}
             </div>
             {purchaseMutation.error && <p className="text-sm text-destructive">{purchaseMutation.error.message}</p>}

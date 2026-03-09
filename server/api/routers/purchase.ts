@@ -3,14 +3,18 @@ import { TRPCError } from "@trpc/server";
 import { ListingStatus, ListingType, PurchaseStatus } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
+import { computePlatformFeeCents } from "@/lib/monetization";
 
 export const purchaseRouter = createTRPCRouter({
   purchase: sensitiveProcedure
-    .input(z.object({ listingId: z.string() }))
+    .input(z.object({
+      listingId: z.string(),
+      stripePaymentId: z.string().optional(),
+    }))
     .mutation(async ({ ctx, input }) => {
       const listing = await ctx.db.listing.findUnique({
         where: { id: input.listingId },
-        include: { seller: true },
+        include: { seller: { select: { id: true, plan: true } } },
       });
       if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
       if (listing.status !== ListingStatus.AVAILABLE) {
@@ -22,6 +26,10 @@ export const purchaseRouter = createTRPCRouter({
       if (listing.sellerId === ctx.userId) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot buy your own listing" });
       }
+      const priceCents = Math.round(Number(listing.price) * 100);
+      const isProSeller = listing.seller.plan === "PRO";
+      const platformFeeCents = computePlatformFeeCents(priceCents, isProSeller);
+
       const [purchase] = await ctx.db.$transaction([
         ctx.db.purchase.create({
           data: {
@@ -30,6 +38,8 @@ export const purchaseRouter = createTRPCRouter({
             sellerId: listing.sellerId,
             status: PurchaseStatus.PENDING,
             finalPrice: listing.price,
+            platformFeeCents,
+            stripePaymentId: input.stripePaymentId ?? null,
           },
         }),
         ctx.db.listing.update({
