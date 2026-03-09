@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
       request.headers.get("x-real-ip") ??
       "unknown";
     const { rateLimit } = await import("@/lib/rate-limit");
-    const result = rateLimit(`api:${ip}`, 200, 60 * 1000);
+    const result = rateLimit(`api:${ip}`, 400, 60 * 1000);
     if (!result.success) {
       return NextResponse.json(
         { error: "Too many API requests. Slow down." },

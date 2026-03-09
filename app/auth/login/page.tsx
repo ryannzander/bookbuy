@@ -53,8 +53,8 @@ function LoginForm() {
       setError(cleanAuthError(err.message));
       return;
     }
-    router.replace(next);
-    router.refresh();
+    // Full navigation so cookies/session are applied before next page
+    window.location.href = next.startsWith("/") ? next : `/${next}`;
   }
 
   return (

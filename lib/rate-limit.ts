@@ -70,27 +70,27 @@ export function rateLimit(
 
 // ─── Preset configurations ──────────────────────────────────────
 
-/** Auth routes: 10 requests per 15 minutes per IP */
+/** Auth routes: 30 requests per 15 minutes per IP (page loads + retries) */
 export function authRateLimit(ip: string) {
-  return rateLimit(`auth:${ip}`, 10, 15 * 60 * 1000);
+  return rateLimit(`auth:${ip}`, 30, 15 * 60 * 1000);
 }
 
-/** API queries: 100 requests per minute per key */
+/** API queries: 200 requests per minute per key */
 export function queryRateLimit(key: string) {
-  return rateLimit(`query:${key}`, 100, 60 * 1000);
+  return rateLimit(`query:${key}`, 200, 60 * 1000);
 }
 
-/** API mutations: 30 requests per minute per key */
+/** API mutations: 60 requests per minute per key */
 export function mutationRateLimit(key: string) {
-  return rateLimit(`mutation:${key}`, 30, 60 * 1000);
+  return rateLimit(`mutation:${key}`, 60, 60 * 1000);
 }
 
-/** Sensitive mutations (purchase, report, delete): 10 per 5 minutes */
+/** Sensitive mutations (purchase, report, delete): 25 per 5 minutes */
 export function sensitiveRateLimit(key: string) {
-  return rateLimit(`sensitive:${key}`, 10, 5 * 60 * 1000);
+  return rateLimit(`sensitive:${key}`, 25, 5 * 60 * 1000);
 }
 
-/** Search/autocomplete: 30 requests per minute per key */
+/** Search/autocomplete: 60 requests per minute per key */
 export function searchRateLimit(key: string) {
-  return rateLimit(`search:${key}`, 30, 60 * 1000);
+  return rateLimit(`search:${key}`, 60, 60 * 1000);
 }
