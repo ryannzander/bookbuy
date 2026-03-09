@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           "bg-foreground text-background hover:bg-foreground/90 rounded-full shadow-sm hover:shadow-md",
         primary:
-          "bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 rounded-full shadow-[0_4px_14px_0_rgba(139,92,246,0.4)] hover:shadow-[0_6px_20px_0_rgba(139,92,246,0.5)]",
+          "bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 rounded-full shadow-[0_4px_14px_0_rgba(45,212,191,0.4)] hover:shadow-[0_6px_20px_0_rgba(45,212,191,0.5)]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-sm",
         outline:

@@ -43,7 +43,7 @@ export function StatsCards({ stats }: { stats: DashboardStats }) {
         return (
           <div
             key={card.label}
-            className={`group rounded-2xl bg-card border border-border p-6 hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(139,92,246,0.05)] transition-all duration-300 animate-fade-in-up`}
+            className={`group rounded-2xl bg-card border border-border p-6 hover:border-primary/30 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_20px_rgba(45,212,191,0.08)] transition-all duration-300 animate-fade-in-up`}
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="flex items-center justify-between">

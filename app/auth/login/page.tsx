@@ -69,10 +69,10 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-3 group">
-            <span className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
+            <span className="h-12 w-12 rounded-2xl bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary/30 transition-colors">
               <BookOpen className="h-6 w-6" />
             </span>
-            <span className="text-2xl font-bold text-foreground">BuyBook</span>
+            <span className="text-2xl font-bold text-foreground">BookBuy</span>
           </Link>
         </div>
 
@@ -81,7 +81,7 @@ function LoginForm() {
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
             <p className="mt-2 text-muted-foreground">
-              Sign in to your BuyBook account
+              Sign in to your BookBuy account
             </p>
           </div>
 

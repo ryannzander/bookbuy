@@ -1,38 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium dark theme with indigo/violet accents */
-  --background: #09090b;
+  /* Premium dark theme with teal accents */
+  --background: #071a18;
   --foreground: #fafafa;
-  --card: #0c0c0f;
+  --card: #0a2520;
   --card-foreground: #fafafa;
-  --popover: #0c0c0f;
+  --popover: #0a2520;
   --popover-foreground: #fafafa;
-  --primary: #8b5cf6;
-  --primary-foreground: #fafafa;
-  --secondary: #18181b;
+  --primary: #2dd4bf;
+  --primary-foreground: #071a18;
+  --secondary: #0d3d38;
   --secondary-foreground: #fafafa;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-  --accent: #6366f1;
-  --accent-foreground: #fafafa;
+  --muted: #0d3d38;
+  --muted-foreground: #94a3b8;
+  --accent: #5eead4;
+  --accent-foreground: #071a18;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
   --success: #22c55e;
-  --success-foreground: #09090b;
+  --success-foreground: #071a18;
   --warning: #f59e0b;
-  --warning-foreground: #09090b;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #8b5cf6;
+  --warning-foreground: #071a18;
+  --border: #134e45;
+  --input: #134e45;
+  --ring: #2dd4bf;
   --radius: 0.75rem;
   
   /* Extended palette for gradients and accents */
-  --violet-glow: rgba(139, 92, 246, 0.15);
-  --indigo-glow: rgba(99, 102, 241, 0.15);
-  --gradient-start: #8b5cf6;
-  --gradient-end: #6366f1;
-  --card-hover: #111114;
+  --teal-glow: rgba(45, 212, 191, 0.15);
+  --cyan-glow: rgba(94, 234, 212, 0.15);
+  --gradient-start: #2dd4bf;
+  --gradient-end: #5eead4;
+  --card-hover: #0d3d38;
 }
 
 @theme inline {
@@ -68,19 +68,19 @@
 }
 
 .light {
-  --background: #fafafa;
-  --foreground: #09090b;
+  --background: #f8fffe;
+  --foreground: #071a18;
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #071a18;
   --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #7c3aed;
+  --popover-foreground: #071a18;
+  --primary: #0d9488;
   --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #09090b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #4f46e5;
+  --secondary: #f0fdfa;
+  --secondary-foreground: #071a18;
+  --muted: #f0fdfa;
+  --muted-foreground: #64748b;
+  --accent: #14b8a6;
   --accent-foreground: #fafafa;
   --destructive: #dc2626;
   --destructive-foreground: #fafafa;
@@ -88,14 +88,14 @@
   --success-foreground: #fafafa;
   --warning: #d97706;
   --warning-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #7c3aed;
-  --violet-glow: rgba(124, 58, 237, 0.1);
-  --indigo-glow: rgba(79, 70, 229, 0.1);
-  --gradient-start: #7c3aed;
-  --gradient-end: #4f46e5;
-  --card-hover: #f9f9fb;
+  --border: #ccfbf1;
+  --input: #ccfbf1;
+  --ring: #0d9488;
+  --teal-glow: rgba(13, 148, 136, 0.1);
+  --cyan-glow: rgba(20, 184, 166, 0.1);
+  --gradient-start: #0d9488;
+  --gradient-end: #14b8a6;
+  --card-hover: #f0fdfa;
 }
 
 .light ::selection {
@@ -193,13 +193,13 @@ a, button, input, textarea, select {
   background-clip: text;
 }
 
-/* Subtle violet glow for premium elements */
+/* Subtle teal glow for premium elements */
 .glow {
-  box-shadow: 0 0 40px var(--violet-glow), 0 0 80px var(--indigo-glow);
+  box-shadow: 0 0 40px var(--teal-glow), 0 0 80px var(--cyan-glow);
 }
 
 .glow-sm {
-  box-shadow: 0 0 20px var(--violet-glow);
+  box-shadow: 0 0 20px var(--teal-glow);
 }
 
 /* Glass morphism effects */
@@ -297,10 +297,10 @@ a, button, input, textarea, select {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px var(--violet-glow);
+    box-shadow: 0 0 20px var(--teal-glow);
   }
   50% {
-    box-shadow: 0 0 40px var(--violet-glow), 0 0 60px var(--indigo-glow);
+    box-shadow: 0 0 40px var(--teal-glow), 0 0 60px var(--cyan-glow);
   }
 }
 
@@ -366,11 +366,11 @@ a, button, input, textarea, select {
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--violet-glow);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--teal-glow);
 }
 
 .light .hover-lift:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 0 20px var(--violet-glow);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1), 0 0 20px var(--teal-glow);
 }
 
 /* Image zoom on hover */
@@ -412,12 +412,12 @@ a, button, input, textarea, select {
 /* Price badge styling */
 .price-badge {
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  color: white;
+  color: var(--primary-foreground);
   font-weight: 600;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.875rem;
-  box-shadow: 0 2px 8px var(--violet-glow);
+  box-shadow: 0 2px 8px var(--teal-glow);
 }
 
 /* Condition indicator dots */
@@ -435,15 +435,15 @@ a, button, input, textarea, select {
 /* Stats card gradient icons */
 .stats-icon {
   background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  color: white;
+  color: var(--primary-foreground);
   padding: 0.75rem;
   border-radius: var(--radius);
-  box-shadow: 0 4px 12px var(--violet-glow);
+  box-shadow: 0 4px 12px var(--teal-glow);
 }
 
 /* Form focus styles */
 .input-focus-glow:focus {
-  box-shadow: 0 0 0 3px var(--violet-glow);
+  box-shadow: 0 0 0 3px var(--teal-glow);
 }
 
 /* Subtle noise texture overlay */
