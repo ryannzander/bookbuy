@@ -14,7 +14,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isBare = BARE_ROUTES.some((r) => pathname?.startsWith(r));
   const isApiRoute = pathname?.startsWith("/api");
-  const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
+  const { data: me, isLoading: meLoading } = api.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  });
   const { data: unreadCount = 0 } = api.notification.unreadCount.useQuery(
     undefined,
     { retry: false, enabled: !!me, refetchInterval: 15_000 }
@@ -23,14 +28,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isBare || isApiRoute) return <>{children}</>;
 
   const fallbackUser: User = { id: "guest", name: "Guest User", username: "guest", email: "guest@buybook.local", avatarUrl: null, schoolName: null, verified: false, createdAt: new Date().toISOString() };
-  const user: User = me ? { id: me.id, name: me.name ?? null, username: (me.name ?? me.email.split("@")[0]).toLowerCase(), email: me.email, avatarUrl: me.avatarUrl ?? null, schoolName: me.schoolName ?? null, verified: me.verified, createdAt: me.createdAt.toISOString() } : fallbackUser;
+  const user: User = me
+    ? { id: me.id, name: me.name ?? null, username: (me.name ?? me.email.split("@")[0]).toLowerCase(), email: me.email, avatarUrl: me.avatarUrl ?? null, schoolName: me.schoolName ?? null, verified: me.verified, createdAt: me.createdAt.toISOString() }
+    : fallbackUser;
   const isAdmin = (me as { role?: string } | undefined)?.role === "ADMIN";
 
   return (
     <div className="min-h-screen flex bg-background text-foreground antialiased">
       <div className="hidden lg:flex"><DashboardSidebar unreadCount={unreadCount} isAdmin={isAdmin} /></div>
       <div className="flex-1 flex flex-col min-w-0">
-        <DashboardHeader user={user} unreadCount={unreadCount} />
+        <DashboardHeader user={user} unreadCount={unreadCount} isUserLoading={meLoading} />
         <nav className="lg:hidden border-b border-border/50 bg-card/50 backdrop-blur-sm px-4 py-3">
           <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
             {[

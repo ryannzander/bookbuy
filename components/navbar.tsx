@@ -17,7 +17,12 @@ export function Navbar() {
     data: user,
     isLoading: userLoading,
     isError: userError,
-  } = api.auth.me.useQuery(undefined, { retry: false });
+  } = api.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  });
   const isLoggedIn = !!user;
   const { data: unread } = api.notification.unreadCount.useQuery(undefined, {
     enabled: isLoggedIn,

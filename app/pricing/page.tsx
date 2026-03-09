@@ -6,7 +6,12 @@ import { Check, Zap, Star } from "lucide-react";
 import Link from "next/link";
 
 export default function PricingPage() {
-  const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
+  const { data: me, isLoading: meLoading } = api.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  });
   const createCheckout = api.stripe.createSubscriptionCheckout.useMutation({
     onSuccess: (data) => { if (data.url) window.location.href = data.url; },
   });
@@ -50,6 +55,10 @@ export default function PricingPage() {
           </ul>
           {isPro ? (
             <p className="mt-8 text-center text-sm text-muted-foreground">You&apos;re on Pro</p>
+          ) : meLoading ? (
+            <Button size="lg" className="w-full mt-8" disabled>
+              Loading...
+            </Button>
           ) : me ? (
             <Button size="lg" className="w-full mt-8 gap-2" onClick={() => createCheckout.mutate()} disabled={createCheckout.isPending}>
               {createCheckout.isPending ? "Loading..." : "Upgrade to Pro"}

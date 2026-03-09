@@ -15,11 +15,15 @@ import {
 export function DashboardHeader({
   user,
   unreadCount,
+  isUserLoading = false,
 }: {
   user: User;
   unreadCount: number;
+  isUserLoading?: boolean;
 }) {
-  const initials = user.name
+  const initials = isUserLoading
+    ? "…"
+    : user.name
     ? user.name
         .split(" ")
         .map((n) => n[0])
@@ -81,10 +85,10 @@ export function DashboardHeader({
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-semibold text-foreground leading-tight">
-                  {user.name ?? "User"}
+                  {isUserLoading ? "Loading..." : (user.name ?? "User")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {user.verified ? "Verified" : "Student"}
+                  {isUserLoading ? " " : (user.verified ? "Verified" : "Student")}
                 </p>
               </div>
             </button>
