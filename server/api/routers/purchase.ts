@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ListingStatus, ListingType, PurchaseStatus } from "@prisma/client";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
 
 export const purchaseRouter = createTRPCRouter({
-  purchase: protectedProcedure
+  purchase: sensitiveProcedure
     .input(z.object({ listingId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const listing = await ctx.db.listing.findUnique({
