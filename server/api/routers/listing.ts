@@ -263,7 +263,11 @@ export const listingRouter = createTRPCRouter({
       return { ok: true };
     }),
 
-  archiveExpired: publicProcedure.mutation(async ({ ctx }) => {
+  archiveExpired: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({ where: { id: ctx.userId }, select: { role: true } });
+    if (user?.role !== "ADMIN") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+    }
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
     const result = await ctx.db.listing.updateMany({
       where: { status: "AVAILABLE", updatedAt: { lt: ninetyDaysAgo } },
