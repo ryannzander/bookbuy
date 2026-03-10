@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, MessageSquare, Shield, Users } from "lucide-react";
+import { LandingStats } from "@/components/landing/landing-stats";
 
 export default function LandingPage() {
   return (
@@ -47,20 +48,7 @@ export default function LandingPage() {
             </div>
 
             {/* Stats */}
-            <div className="mt-16 flex flex-wrap gap-12 sm:gap-16">
-              <div>
-                <p className="text-4xl sm:text-5xl font-bold text-foreground">500+</p>
-                <p className="mt-1 text-sm text-muted-foreground">Active Listings</p>
-              </div>
-              <div>
-                <p className="text-4xl sm:text-5xl font-bold text-foreground">1,200+</p>
-                <p className="mt-1 text-sm text-muted-foreground">Verified Students</p>
-              </div>
-              <div>
-                <p className="text-4xl sm:text-5xl font-bold text-foreground">$45K+</p>
-                <p className="mt-1 text-sm text-muted-foreground">Saved by Students</p>
-              </div>
-            </div>
+            <LandingStats />
           </div>
         </div>
 
@@ -148,7 +136,7 @@ export default function LandingPage() {
               Ready to save on textbooks?
             </h2>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
-              Join thousands of students already trading textbooks at your school.
+              Join students trading textbooks at your school.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Link href="/auth/signup">
