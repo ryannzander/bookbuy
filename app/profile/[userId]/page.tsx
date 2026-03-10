@@ -1,20 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Check, Calendar, Star, Clock } from "lucide-react";
+import { BookOpen, Check, Calendar, MessageSquare, Star, Clock } from "lucide-react";
 
 export default function PublicProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const userId = params.userId as string;
   const { data, isLoading } = api.seller.getByUserId.useQuery({ userId });
+  const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
+  const createThread = api.message.createThread.useMutation({
+    onSuccess: (t) => router.push(`/messages?thread=${t.id}`),
+  });
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><div className="flex items-center gap-3 text-muted-foreground"><div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />Loading...</div></div>;
   if (!data) return <div className="text-center py-20"><p className="text-lg font-semibold">User not found</p></div>;
 
   const { user, listings, reviewsReceived, avgRating, avgResponseMinutes } = data;
+  const isOwnProfile = me?.id === userId;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -37,6 +43,28 @@ export default function PublicProfilePage() {
               <div className="h-8 w-px bg-border" />
               <div className="text-center"><p className="text-2xl font-bold text-foreground">{reviewsReceived.length}</p><p className="text-xs text-muted-foreground">Reviews</p></div>
             </div>
+            {!isOwnProfile && (
+              <div className="mt-4">
+                {me ? (
+                  <Button
+                    size="lg"
+                    className="gap-2"
+                    onClick={() => createThread.mutate({ otherUserId: userId })}
+                    disabled={createThread.isPending}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    {createThread.isPending ? "Opening..." : "Message"}
+                  </Button>
+                ) : (
+                  <Link href={"/auth/login?next=/profile/" + userId}>
+                    <Button size="lg" variant="outline" className="gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Log in to message
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

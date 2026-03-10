@@ -77,7 +77,7 @@ export default function LeaderboardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Link
-                        href={`/sellers/${seller.id}`}
+                        href={`/profile/${seller.id}`}
                         className="text-lg font-semibold text-foreground hover:underline"
                       >
                         {seller.name ?? "Seller"}
@@ -116,7 +116,7 @@ export default function LeaderboardPage() {
 
                   {/* View Profile */}
                   <Link
-                    href={`/sellers/${seller.id}`}
+                    href={`/profile/${seller.id}`}
                     className="hidden sm:inline-flex rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
                   >
                     View Profile

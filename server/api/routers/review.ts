@@ -38,7 +38,7 @@ export const reviewRouter = createTRPCRouter({
         type: "REVIEW_RECEIVED",
         title: "You received a new review",
         body: `Your buyer left a ${input.rating}-star review.`,
-        linkUrl: `/sellers/${purchase.listing.sellerId}`,
+        linkUrl: `/profile/${purchase.listing.sellerId}`,
       });
       return review;
     }),

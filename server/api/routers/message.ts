@@ -98,6 +98,33 @@ export const messageRouter = createTRPCRouter({
       return message;
     }),
 
+  deleteMessage: protectedProcedure
+    .input(z.object({ messageId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const msg = await ctx.db.message.findUnique({ where: { id: input.messageId }, include: { thread: true } });
+      if (!msg) throw new TRPCError({ code: "NOT_FOUND" });
+      if (msg.senderId !== ctx.userId) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only delete your own messages" });
+      }
+      const { userAId, userBId } = msg.thread;
+      if (userAId !== ctx.userId && userBId !== ctx.userId) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      await ctx.db.message.delete({ where: { id: input.messageId } });
+      return { ok: true };
+    }),
+
+  deleteThread: protectedProcedure
+    .input(z.object({ threadId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const thread = await ctx.db.messageThread.findUnique({ where: { id: input.threadId } });
+      if (!thread || (thread.userAId !== ctx.userId && thread.userBId !== ctx.userId)) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      await ctx.db.messageThread.delete({ where: { id: input.threadId } });
+      return { ok: true };
+    }),
+
   markRead: protectedProcedure
     .input(z.object({ threadId: z.string() }))
     .mutation(async ({ ctx, input }) => {
