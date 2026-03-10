@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, MessageSquare, Shield, Users } from "lucide-react";
+import { LandingStats } from "@/components/landing/landing-stats";
 
 export default function LandingPage() {
   return (
@@ -36,21 +37,24 @@ export default function LandingPage() {
                 The trusted marketplace for students to buy and sell textbooks at your school, without the markup.
               </p>
 
-              {/* CTAs */}
-              <div className="mt-10 flex flex-wrap items-center gap-4">
-                <Link href="/auth/signup">
-                  <Button className="rounded-full bg-[#0d3d38] border border-[#2dd4bf]/30 text-white hover:bg-[#0d3d38]/80 hover:border-[#2dd4bf]/50 px-6 h-12 text-sm font-medium transition-all">
-                    Get Started
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
-                <Link href="/marketplace">
-                  <Button className="rounded-full bg-white text-[#0a2f2a] hover:bg-white/90 px-6 h-12 text-sm font-medium transition-all">
-                    Browse Books
-                  </Button>
-                </Link>
-              </div>
+            {/* CTAs */}
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Link href="/auth/signup">
+                <Button size="xl" className="group">
+                  Get Started
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/marketplace">
+                <Button variant="outline" size="xl">
+                  Browse Marketplace
+                </Button>
+              </Link>
             </div>
+
+            {/* Stats */}
+            <LandingStats />
+          </div>
 
             {/* Right Column - Stats */}
             <div className="lg:text-right lg:pt-16 animate-fade-in delay-200">
@@ -90,6 +94,33 @@ export default function LandingPage() {
               description="Ratings help you find reliable sellers. Build your reputation with each successful trade."
               showDescription
             />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+          <div className="rounded-3xl border border-border bg-card p-8 sm:p-12 lg:p-16 text-center">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground text-balance">
+              Ready to save on textbooks?
+            </h2>
+            <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
+              Join students trading textbooks at your school.
+            </p>
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <Link href="/auth/signup">
+                <Button size="xl" className="group">
+                  Create Free Account
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/leaderboard">
+                <Button variant="outline" size="xl">
+                  View Top Sellers
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
