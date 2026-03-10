@@ -46,7 +46,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
-              {me?.name ?? "User"}
+              {me?.name ?? me?.email ?? "User"}
             </h2>
             <p className="text-sm text-muted-foreground">{me?.email ?? "..."}</p>
             {me?.verified && (

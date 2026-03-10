@@ -58,20 +58,6 @@ export interface Order {
   status: OrderStatus;
   priceAtPurchase: number;
   createdAt: string;
-  meetupDate: string | null;
-}
-
-export type MeetupStatus = "SCHEDULED" | "PENDING" | "COMPLETED" | "CANCELLED";
-
-export interface Meetup {
-  id: string;
-  orderId: string;
-  buyerName: string;
-  listingTitle: string;
-  startTime: string;
-  endTime: string | null;
-  location: string | null;
-  status: MeetupStatus;
 }
 
 export interface DashboardStats {

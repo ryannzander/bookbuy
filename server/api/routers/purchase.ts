@@ -65,7 +65,6 @@ export const purchaseRouter = createTRPCRouter({
       where: { buyerId: ctx.userId },
       include: {
         listing: { include: { seller: { select: { id: true, name: true } } } },
-        meetup: true,
       },
       orderBy: { purchasedAt: "desc" },
     });
@@ -77,9 +76,23 @@ export const purchaseRouter = createTRPCRouter({
       include: {
         listing: true,
         buyer: { select: { id: true, name: true, email: true } },
-        meetup: true,
       },
       orderBy: { purchasedAt: "desc" },
     });
   }),
+
+  completeOrder: protectedProcedure
+    .input(z.object({ purchaseId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const purchase = await ctx.db.purchase.findUnique({ where: { id: input.purchaseId } });
+      if (!purchase) throw new TRPCError({ code: "NOT_FOUND" });
+      if (purchase.buyerId !== ctx.userId && purchase.sellerId !== ctx.userId) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      await ctx.db.purchase.update({
+        where: { id: input.purchaseId },
+        data: { status: PurchaseStatus.COMPLETED },
+      });
+      return { ok: true };
+    }),
 });

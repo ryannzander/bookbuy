@@ -37,7 +37,7 @@ export const messageRouter = createTRPCRouter({
           listing: { select: { id: true, title: true } },
           messages: {
             orderBy: { createdAt: "asc" },
-            include: { sender: { select: { id: true, name: true } } },
+            include: { sender: { select: { id: true, name: true, email: true } } },
           },
         },
       });

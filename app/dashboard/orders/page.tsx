@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { EmptyState } from "@/components/shared/empty-state";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar, Check, Clock } from "lucide-react";
+import { Check } from "lucide-react";
 
 export default function DashboardOrdersPage() {
   const { data: myPurchases = [], isLoading: loadingPurchases } =
@@ -14,23 +13,12 @@ export default function DashboardOrdersPage() {
     api.purchase.mySales.useQuery();
   const utils = api.useUtils();
 
-  const scheduleMeetup = api.meetup.schedule.useMutation({
+  const completeOrder = api.purchase.completeOrder.useMutation({
     onSuccess: () => {
       utils.purchase.myPurchases.invalidate();
       utils.purchase.mySales.invalidate();
-      utils.meetup.upcoming.invalidate();
     },
   });
-
-  const completeOrder = api.meetup.completeOrder.useMutation({
-    onSuccess: () => {
-      utils.purchase.myPurchases.invalidate();
-      utils.purchase.mySales.invalidate();
-      utils.meetup.upcoming.invalidate();
-    },
-  });
-
-  const [meetupDraft, setMeetupDraft] = useState<Record<string, string>>({});
 
   const orders = useMemo(() => {
     const purchaseOrders = myPurchases.map((p) => ({
@@ -40,7 +28,6 @@ export default function DashboardOrdersPage() {
       status: p.status,
       purchasedAt: p.purchasedAt,
       role: "Buyer" as const,
-      meetupDate: p.meetupDate,
     }));
     const salesOrders = mySales.map((p) => ({
       id: p.id,
@@ -49,7 +36,6 @@ export default function DashboardOrdersPage() {
       status: p.status,
       purchasedAt: p.purchasedAt,
       role: "Seller" as const,
-      meetupDate: p.meetupDate,
     }));
     return [...purchaseOrders, ...salesOrders].sort((a, b) =>
       a.purchasedAt < b.purchasedAt ? 1 : -1
@@ -109,12 +95,6 @@ export default function DashboardOrdersPage() {
                       ${order.price}
                     </span>
                     <span>{new Date(order.purchasedAt).toLocaleDateString()}</span>
-                    {order.meetupDate && (
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(order.meetupDate).toLocaleString()}
-                      </span>
-                    )}
                   </div>
                 </div>
 
@@ -133,53 +113,18 @@ export default function DashboardOrdersPage() {
 
               {order.status === "PENDING" && (
                 <div className="mt-6 pt-6 border-t border-border">
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-2 flex-1 min-w-64">
-                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <Input
-                        type="datetime-local"
-                        className="flex-1"
-                        value={meetupDraft[order.id] ?? ""}
-                        onChange={(e) =>
-                          setMeetupDraft((prev) => ({
-                            ...prev,
-                            [order.id]: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        const value = meetupDraft[order.id];
-                        if (!value) return;
-                        scheduleMeetup.mutate({
-                          purchaseId: order.id,
-                          startTime: new Date(value),
-                        });
-                      }}
-                      disabled={
-                        !meetupDraft[order.id] || scheduleMeetup.isPending
-                      }
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Schedule Meetup
-                    </Button>
-                    <Button
-                      onClick={() =>
-                        completeOrder.mutate({ purchaseId: order.id })
-                      }
-                      disabled={completeOrder.isPending}
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Mark Completed
-                    </Button>
-                  </div>
-
-                  {(scheduleMeetup.error || completeOrder.error) && (
+                  <Button
+                    onClick={() =>
+                      completeOrder.mutate({ purchaseId: order.id })
+                    }
+                    disabled={completeOrder.isPending}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Mark Completed
+                  </Button>
+                  {completeOrder.error && (
                     <p className="mt-3 text-sm text-destructive">
-                      {scheduleMeetup.error?.message ??
-                        completeOrder.error?.message}
+                      {completeOrder.error.message}
                     </p>
                   )}
                 </div>

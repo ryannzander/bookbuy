@@ -4,7 +4,6 @@ import { StatsCards } from "@/components/dashboard/stats-cards";
 import { StatsChart } from "@/components/dashboard/stats-chart";
 import { ListingsGrid } from "@/components/dashboard/listings-grid";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
-import { ActivityWidget } from "@/components/dashboard/activity-widget";
 import { ErrorState } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
@@ -124,7 +123,6 @@ export default async function DashboardPage() {
       {/* Sidebar */}
       <aside className="space-y-6">
         <CalendarWidget />
-        <ActivityWidget meetups={data.upcomingMeetups} />
       </aside>
     </div>
   );

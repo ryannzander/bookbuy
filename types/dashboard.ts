@@ -1,7 +1,6 @@
 import type {
   DashboardStats,
   Listing,
-  Meetup,
   Notification,
   Order,
   SellerProfile,
@@ -22,7 +21,6 @@ export interface DashboardData {
   stats: DashboardStats;
   recentListings: Listing[];
   recentOrders: Order[];
-  upcomingMeetups: Meetup[];
   notifications: Notification[];
   activitySeries: ActivityPoint[];
 }

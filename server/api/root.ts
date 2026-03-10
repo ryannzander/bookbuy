@@ -5,7 +5,6 @@ import { purchaseRouter } from "@/server/api/routers/purchase";
 import { sellerRouter } from "@/server/api/routers/seller";
 import { notificationRouter } from "@/server/api/routers/notification";
 import { messageRouter } from "@/server/api/routers/message";
-import { meetupRouter } from "@/server/api/routers/meetup";
 import { reportRouter } from "@/server/api/routers/report";
 import { analyticsRouter } from "@/server/api/routers/analytics";
 import { wishlistRouter } from "@/server/api/routers/wishlist";
@@ -21,7 +20,6 @@ export const appRouter = createTRPCRouter({
   seller: sellerRouter,
   notification: notificationRouter,
   message: messageRouter,
-  meetup: meetupRouter,
   report: reportRouter,
   analytics: analyticsRouter,
   wishlist: wishlistRouter,

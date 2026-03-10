@@ -344,7 +344,7 @@ function MarketplaceContent() {
 
                       <div className="mt-4 pt-4 border-t border-border/50">
                         <span className="text-sm text-muted-foreground">
-                          {listing.seller.name ?? "Seller"}
+                          {listing.seller.name ?? listing.seller.email ?? "Seller"}
                         </span>
                       </div>
                     </div>

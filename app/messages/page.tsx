@@ -124,7 +124,7 @@ function MessagesContent() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-muted-foreground mb-1">
-                      {m.sender.name ?? "User"}
+                      {m.sender.name ?? m.sender.email}
                     </p>
                     <div className="rounded-2xl rounded-tl-none bg-secondary p-4">
                       <p className="text-sm text-foreground">{m.body}</p>

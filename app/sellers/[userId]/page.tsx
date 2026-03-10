@@ -25,7 +25,7 @@ export default function SellerPage() {
         <CardHeader>
           <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold">{user.name ?? "Seller"}</h1>
+              <h1 className="text-2xl font-bold">{user.name ?? user.email ?? "Seller"}</h1>
               <div className="mt-1 flex items-center gap-2">
                 {user.verified && (
                   <span className="rounded-md bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">

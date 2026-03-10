@@ -23,7 +23,7 @@ export default function PublicProfilePage() {
           <div className="h-20 w-20 rounded-2xl bg-foreground text-background flex items-center justify-center text-2xl font-bold shrink-0">{user.name?.[0]?.toUpperCase() ?? "?"}</div>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-foreground">{user.name ?? "User"}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{user.name ?? user.email}</h1>
               {user.verified && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/20 text-success text-xs font-medium"><Check className="h-3 w-3" /> Verified</span>}
             </div>
             {user.schoolName && <p className="text-muted-foreground mt-1">{user.schoolName}</p>}

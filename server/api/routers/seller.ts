@@ -9,7 +9,7 @@ export const sellerRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
-        select: { id: true, name: true, avatarUrl: true, createdAt: true, verified: true, schoolName: true },
+        select: { id: true, name: true, email: true, avatarUrl: true, createdAt: true, verified: true, schoolName: true },
       });
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
       const listings = await ctx.db.listing.findMany({
@@ -46,6 +46,7 @@ export const sellerRouter = createTRPCRouter({
         select: {
           id: true,
           name: true,
+          email: true,
           avatarUrl: true,
           verified: true,
           schoolName: true,
@@ -70,6 +71,7 @@ export const sellerRouter = createTRPCRouter({
           return {
             id: seller.id,
             name: seller.name,
+            email: seller.email,
             avatarUrl: seller.avatarUrl,
             verified: seller.verified,
             schoolName: seller.schoolName,

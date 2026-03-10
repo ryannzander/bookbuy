@@ -98,7 +98,7 @@ export function Navbar() {
                 <DropdownMenuContent align="end" className="w-56">
                   <div className="px-3 py-2">
                     <p className="text-sm font-semibold text-foreground">
-                      {user.name ?? "User"}
+                      {user.name ?? user.email}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {user.email}

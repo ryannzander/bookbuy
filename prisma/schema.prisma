@@ -104,10 +104,7 @@ model Purchase {
   finalPrice       Decimal        @db.Decimal(10, 2)
   platformFeeCents Int           @default(0)
   stripePaymentId  String?
-  meetupDate       DateTime?
   purchasedAt      DateTime       @default(now())
-
-  meetup Meetup?
 
   @@unique([listingId])
   @@index([buyerId, status])
@@ -168,25 +165,6 @@ model Message {
   createdAt DateTime      @default(now())
 
   @@index([threadId, createdAt])
-}
-
-model Meetup {
-  id         String       @id @default(cuid())
-  purchaseId String       @unique
-  purchase   Purchase     @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
-  startTime  DateTime
-  endTime    DateTime?
-  location   String?
-  status     MeetupStatus @default(SCHEDULED)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-}
-
-enum MeetupStatus {
-  SCHEDULED
-  PENDING
-  COMPLETED
-  CANCELLED
 }
 
 model Report {

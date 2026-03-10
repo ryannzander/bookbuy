@@ -14,7 +14,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { data: me } = api.auth.me.useQuery();
   const [step, setStep] = useState<Step>("welcome");
-  const [username, setUsername] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [courses, setCourses] = useState<{ code: string; name: string }[]>([]);
   const [courseCode, setCourseCode] = useState("");
@@ -27,8 +26,8 @@ export default function OnboardingPage() {
   });
 
   async function handleProfileNext() {
-    if (username.trim()) {
-      await updateProfile.mutateAsync({ username: username.trim(), schoolName: schoolName.trim() || undefined });
+    if (schoolName.trim()) {
+      await updateProfile.mutateAsync({ schoolName: schoolName.trim() });
     }
     setStep("courses");
   }
@@ -113,13 +112,10 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Username</Label>
-                <Input placeholder="e.g. jsmith" value={username} onChange={(e) => setUsername(e.target.value)} />
-              </div>
-              <div className="space-y-2">
                 <Label>School Name (optional)</Label>
                 <Input placeholder="e.g. University of Toronto Schools" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
               </div>
+              <p className="text-sm text-muted-foreground">Others will see you by your email: {me?.email ?? "..."}</p>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" size="lg" onClick={() => setStep("welcome")} className="flex-1">Back</Button>

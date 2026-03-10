@@ -32,6 +32,7 @@ export const listingRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
+              email: true,
               avatarUrl: true,
             },
           },
@@ -95,6 +96,7 @@ export const listingRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
+              email: true,
             },
           },
         },

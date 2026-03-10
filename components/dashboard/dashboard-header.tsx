@@ -85,7 +85,7 @@ export function DashboardHeader({
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-semibold text-foreground leading-tight">
-                  {isUserLoading ? "Loading..." : (user.name ?? "User")}
+                  {isUserLoading ? "Loading..." : (user.name ?? user.email)}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {isUserLoading ? " " : (user.verified ? "Verified" : "Student")}
@@ -96,7 +96,7 @@ export function DashboardHeader({
           <DropdownMenuContent align="end" className="w-56">
             <div className="px-3 py-2">
               <p className="text-sm font-semibold text-foreground">
-                {user.name ?? "User"}
+                {user.name ?? user.email}
               </p>
               <p className="text-xs text-muted-foreground truncate">
                 {user.email}

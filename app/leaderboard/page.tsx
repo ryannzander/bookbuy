@@ -80,7 +80,7 @@ export default function LeaderboardPage() {
                         href={`/sellers/${seller.id}`}
                         className="text-lg font-semibold text-foreground hover:underline"
                       >
-                        {seller.name ?? "Seller"}
+                        {seller.name ?? seller.email ?? "Seller"}
                       </Link>
                       {seller.verified && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">

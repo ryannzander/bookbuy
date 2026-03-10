@@ -4,7 +4,7 @@ import type {
   DashboardDataResult,
   ActivityPoint,
 } from "@/types/dashboard";
-import type { Listing, Meetup, Notification, Order } from "@/types/entities";
+import type { Listing, Notification, Order } from "@/types/entities";
 
 function parseImageUrls(raw: string | null): string[] {
   if (!raw) return [];
@@ -89,7 +89,7 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
     const me = await caller.auth.me();
     if (!me) return { status: "unauthenticated" };
 
-    const [listingsRaw, purchasesRaw, salesRaw, notificationsRaw, sellerSummary, analytics, meetupsRaw] =
+    const [listingsRaw, purchasesRaw, salesRaw, notificationsRaw, sellerSummary, analytics] =
       await Promise.all([
         caller.listing.getMyListings(),
         caller.purchase.myPurchases(),
@@ -97,7 +97,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
         caller.notification.getMine({ limit: 10 }),
         caller.seller.getByUserId({ userId: me.id }).catch(() => null),
         caller.analytics.dashboardSummary(),
-        caller.meetup.upcoming(),
       ]);
 
     const recentListings = listingsRaw.map(toListing);
@@ -111,7 +110,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       status: p.status,
       priceAtPurchase: Number(p.finalPrice),
       createdAt: p.purchasedAt.toISOString(),
-      meetupDate: p.meetupDate ? p.meetupDate.toISOString() : null,
     }));
 
     const salesOrders: Order[] = salesRaw.map((p) => ({
@@ -123,18 +121,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       status: p.status,
       priceAtPurchase: Number(p.finalPrice),
       createdAt: p.purchasedAt.toISOString(),
-      meetupDate: p.meetupDate ? p.meetupDate.toISOString() : null,
-    }));
-
-    const upcomingMeetups: Meetup[] = meetupsRaw.map((m) => ({
-      id: m.id,
-      orderId: m.purchaseId,
-      buyerName: m.purchase.buyer.name ?? "Buyer",
-      listingTitle: m.purchase.listing.title,
-      startTime: m.startTime.toISOString(),
-      endTime: m.endTime ? m.endTime.toISOString() : null,
-      location: m.location ?? null,
-      status: m.status,
     }));
 
     const notifications: Notification[] = notificationsRaw.items.map((n) => ({
@@ -175,7 +161,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       recentOrders: [...salesOrders, ...recentOrders]
         .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
         .slice(0, 6),
-      upcomingMeetups,
       notifications,
       activitySeries: buildActivitySeries(recentListings, recentOrders),
     };

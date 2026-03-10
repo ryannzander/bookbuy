@@ -82,7 +82,7 @@ export default function LandingPage() {
             <FeatureCard
               number="03"
               title="Secure Messaging"
-              description="Chat with buyers and sellers directly in-app. Schedule meetups safely on campus."
+              description="Chat with buyers and sellers directly in-app."
             />
             <FeatureCard
               number="04"
