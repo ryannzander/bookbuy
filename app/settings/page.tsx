@@ -27,8 +27,11 @@ export default function SettingsPage() {
 
   const deleteAccount = api.auth.deleteAccount.useMutation({
     onSuccess: async () => {
-      await supabase.auth.signOut();
-      window.location.href = "/";
+      try {
+        await supabase.auth.signOut();
+      } finally {
+        window.location.href = "/";
+      }
     },
     onError: (e) => {
       setDeleteError(e.message);

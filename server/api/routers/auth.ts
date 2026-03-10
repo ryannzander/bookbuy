@@ -61,7 +61,8 @@ export const authRouter = createTRPCRouter({
     try {
       await ctx.db.user.delete({ where: { id: ctx.userId } });
     } catch (e) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to delete account" });
+      const msg = e instanceof Error ? e.message : "Failed to delete account";
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: msg });
     }
     const admin = createAdminClient();
     if (admin) {

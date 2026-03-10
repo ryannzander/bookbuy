@@ -66,7 +66,7 @@ export default function LandingPage() {
             <FeatureCard
               number="01"
               title="Verified Students"
-              description="Only school email addresses allowed. Trade with confidence knowing you're dealing with real students."
+              description="Only school email addresses allowed. Sell with confidence knowing you're dealing with real students."
             />
             <FeatureCard
               number="02"
@@ -81,7 +81,7 @@ export default function LandingPage() {
             <FeatureCard
               number="04"
               title="Trusted Reviews"
-              description="Ratings help you find reliable sellers. Build your reputation with each successful trade."
+              description="Ratings help you find reliable sellers. Build your reputation with each successful sale."
             />
           </div>
         </div>
@@ -111,6 +111,15 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="relative border-t border-white/10">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
+          <p className="text-center text-sm text-white/50">
+            Built by: Ryan Zander and Hugo Bui
+          </p>
         </div>
       </section>
 
