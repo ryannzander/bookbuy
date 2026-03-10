@@ -6,7 +6,7 @@ import { api } from "@/lib/trpc/client";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, Key, Mail, Settings, User } from "lucide-react";
+import { Check, Key, Mail, Settings, Trash2 } from "lucide-react";
 
 function isUTSchoolsEmail(value: string) {
   return value.trim().toLowerCase().endsWith("@utschools.ca");
@@ -22,6 +22,18 @@ export default function SettingsPage() {
   const [password, setPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const deleteAccount = api.auth.deleteAccount.useMutation({
+    onSuccess: async () => {
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    },
+    onError: (e) => {
+      setDeleteError(e.message);
+    },
+  });
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -187,6 +199,53 @@ export default function SettingsPage() {
             >
               {passwordMessage}
             </p>
+          )}
+        </div>
+      </div>
+
+      {/* Delete Account */}
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-destructive/20 flex items-center justify-center">
+            <Trash2 className="h-5 w-5 text-destructive" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-destructive">Delete Account</h3>
+            <p className="text-sm text-muted-foreground">
+              Permanently delete your account and all data. This cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Type <strong className="text-foreground">delete</strong> to confirm.
+          </p>
+          <Input
+            placeholder="Type delete to confirm"
+            value={deleteConfirm}
+            onChange={(e) => {
+              setDeleteConfirm(e.target.value);
+              setDeleteError(null);
+            }}
+            className="max-w-xs border-destructive/50 focus-visible:ring-destructive"
+          />
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (deleteConfirm.toLowerCase() !== "delete") {
+                setDeleteError("Please type 'delete' to confirm.");
+                return;
+              }
+              deleteAccount.mutate();
+            }}
+            disabled={deleteAccount.isPending || deleteConfirm.toLowerCase() !== "delete"}
+            className="gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            {deleteAccount.isPending ? "Deleting..." : "Delete Account"}
+          </Button>
+          {deleteError && (
+            <p className="text-sm text-destructive">{deleteError}</p>
           )}
         </div>
       </div>

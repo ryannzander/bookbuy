@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, BookOpen, LogOut, Settings, User } from "lucide-react";
+import { Bell, BookOpen, LogOut, Settings, User, UserCircle } from "lucide-react";
 
 export function Navbar() {
   const {
@@ -109,6 +109,12 @@ export function Navbar() {
                     <Link href="/dashboard" className="cursor-pointer">
                       <User className="h-4 w-4 mr-2" />
                       Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={user?.id ? `/profile/${user.id}` : "/dashboard"} className="cursor-pointer">
+                      <UserCircle className="h-4 w-4 mr-2" />
+                      My Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

@@ -2,20 +2,21 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { ListingStatus, type Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 function isUTSchoolsEmail(email: string) {
   return email.toLowerCase().endsWith("@utschools.ca");
 }
 
 const listingCreateInput = z.object({
-  title: z.string().min(1),
-  courseCode: z.string().optional(),
-  author: z.string().min(1),
+  title: z.string().min(1).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
+  courseCode: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
+  author: z.string().min(1).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
   isbn: z.string().min(1),
-  condition: z.string().min(1),
-  subject: z.string().min(1),
-  description: z.string().optional(),
-  edition: z.string().optional(),
+  condition: z.string().min(1).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
+  subject: z.string().min(1).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
+  description: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
+  edition: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
   price: z.number().positive(),
   imageUrls: z.string().optional(),
   isFeatured: z.boolean().optional(),

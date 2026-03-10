@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 export const reportRouter = createTRPCRouter({
   create: sensitiveProcedure
@@ -7,8 +8,8 @@ export const reportRouter = createTRPCRouter({
       z.object({
         targetUserId: z.string().optional(),
         listingId: z.string().optional(),
-        reason: z.string().min(3).max(80),
-        details: z.string().max(1000).optional(),
+        reason: z.string().min(3).max(80).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
+        details: z.string().max(1000).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
       })
     )
     .mutation(async ({ ctx, input }) => {

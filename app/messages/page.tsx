@@ -6,10 +6,11 @@ import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MessageSquare, Send, User } from "lucide-react";
+import { MessageSquare, Send, Trash2, User } from "lucide-react";
 
 function MessagesContent() {
   const searchParams = useSearchParams();
+  const { data: me } = api.auth.me.useQuery();
   const { data: threads = [], isLoading } = api.message.listThreads.useQuery();
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
     searchParams.get("thread")
@@ -24,6 +25,20 @@ function MessagesContent() {
       if (selectedThreadId) {
         utils.message.getThread.invalidate({ threadId: selectedThreadId });
       }
+      utils.message.listThreads.invalidate();
+    },
+  });
+  const deleteMessage = api.message.deleteMessage.useMutation({
+    onSuccess: () => {
+      if (selectedThreadId) {
+        utils.message.getThread.invalidate({ threadId: selectedThreadId });
+      }
+      utils.message.listThreads.invalidate();
+    },
+  });
+  const deleteThread = api.message.deleteThread.useMutation({
+    onSuccess: () => {
+      setSelectedThreadId(null);
       utils.message.listThreads.invalidate();
     },
   });
@@ -94,8 +109,24 @@ function MessagesContent() {
 
       {/* Conversation */}
       <div className="flex-1 rounded-2xl border border-border bg-card overflow-hidden flex flex-col">
-        <div className="p-5 border-b border-border">
+        <div className="p-5 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Conversation</h2>
+          {selectedThreadId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-destructive gap-1"
+              onClick={() => {
+                if (confirm("Delete this conversation? This cannot be undone.")) {
+                  deleteThread.mutate({ threadId: selectedThreadId });
+                }
+              }}
+              disabled={deleteThread.isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </Button>
+          )}
         </div>
 
         {!selectedThreadId ? (
@@ -118,14 +149,28 @@ function MessagesContent() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {threadQuery.data.messages.map((m) => (
-                <div key={m.id} className="flex gap-3">
+                <div key={m.id} className="flex gap-3 group">
                   <div className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
                     <User className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">
-                      {m.sender.name ?? m.sender.email}
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {m.sender.name ?? "User"}
+                      </p>
+                      {m.sender.id === me?.id ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                          onClick={() => deleteMessage.mutate({ messageId: m.id })}
+                          disabled={deleteMessage.isPending}
+                          title="Delete message"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      ) : null}
+                    </div>
                     <div className="rounded-2xl rounded-tl-none bg-secondary p-4">
                       <p className="text-sm text-foreground">{m.body}</p>
                     </div>

@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 export const courseRouter = createTRPCRouter({
   addCourse: protectedProcedure
-    .input(z.object({ courseCode: z.string().min(2).max(20), courseName: z.string().max(120).optional(), semester: z.string().max(30).optional() }))
+    .input(z.object({ courseCode: z.string().min(2).max(20).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE), courseName: z.string().max(120).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE), semester: z.string().max(30).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE) }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.courseSchedule.upsert({
         where: { userId_courseCode: { userId: ctx.userId, courseCode: input.courseCode.toUpperCase() } },

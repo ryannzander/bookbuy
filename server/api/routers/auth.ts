@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 function isUTSchoolsEmail(email: string) {
   return email.toLowerCase().endsWith("@utschools.ca");
@@ -7,7 +10,7 @@ function isUTSchoolsEmail(email: string) {
 
 export const authRouter = createTRPCRouter({
   syncUser: protectedProcedure
-    .input(z.object({ email: z.string().email(), name: z.string().optional(), avatarUrl: z.string().optional() }))
+    .input(z.object({ email: z.string().email(), name: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE), avatarUrl: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.user.upsert({
         where: { id: ctx.userId },
@@ -37,7 +40,7 @@ export const authRouter = createTRPCRouter({
   updateProfile: protectedProcedure
     .input(
       z.object({
-        schoolName: z.string().min(2).max(80).optional(),
+        schoolName: z.string().min(2).max(80).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -51,6 +54,23 @@ export const authRouter = createTRPCRouter({
 
   completeOnboarding: protectedProcedure.mutation(async ({ ctx }) => {
     await ctx.db.user.update({ where: { id: ctx.userId }, data: { onboarded: true } });
+    return { ok: true };
+  }),
+
+  deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+    try {
+      await ctx.db.user.delete({ where: { id: ctx.userId } });
+    } catch (e) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to delete account" });
+    }
+    const admin = createAdminClient();
+    if (admin) {
+      try {
+        await admin.auth.admin.deleteUser(ctx.userId);
+      } catch {
+        // Supabase auth delete may fail; DB user is already gone
+      }
+    }
     return { ok: true };
   }),
 

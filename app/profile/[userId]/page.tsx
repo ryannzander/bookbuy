@@ -1,20 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Check, Calendar, Clock } from "lucide-react";
+import { BookOpen, Check, Calendar, MessageSquare, Clock } from "lucide-react";
 
 export default function PublicProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const userId = params.userId as string;
   const { data, isLoading } = api.seller.getByUserId.useQuery({ userId });
+  const { data: me } = api.auth.me.useQuery(undefined, { retry: false });
+  const createThread = api.message.createThread.useMutation({
+    onSuccess: (t) => router.push(`/messages?thread=${t.id}`),
+  });
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><div className="flex items-center gap-3 text-muted-foreground"><div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />Loading...</div></div>;
   if (!data) return <div className="text-center py-20"><p className="text-lg font-semibold">User not found</p></div>;
 
   const { user, listings, avgResponseMinutes } = data;
+  const isOwnProfile = me?.id === userId;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -23,7 +29,7 @@ export default function PublicProfilePage() {
           <div className="h-20 w-20 rounded-2xl bg-foreground text-background flex items-center justify-center text-2xl font-bold shrink-0">{user.name?.[0]?.toUpperCase() ?? "?"}</div>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-foreground">{user.name ?? user.email}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{user.name ?? "User"}</h1>
               {user.verified && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/20 text-success text-xs font-medium"><Check className="h-3 w-3" /> Verified</span>}
             </div>
             {user.schoolName && <p className="text-muted-foreground mt-1">{user.schoolName}</p>}
@@ -34,6 +40,28 @@ export default function PublicProfilePage() {
             <div className="flex items-center gap-4 mt-4">
               <div className="text-center"><p className="text-2xl font-bold text-foreground">{listings.length}</p><p className="text-xs text-muted-foreground">Listings</p></div>
             </div>
+            {!isOwnProfile && (
+              <div className="mt-4">
+                {me ? (
+                  <Button
+                    size="lg"
+                    className="gap-2"
+                    onClick={() => createThread.mutate({ otherUserId: userId })}
+                    disabled={createThread.isPending}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    {createThread.isPending ? "Opening..." : "Message"}
+                  </Button>
+                ) : (
+                  <Link href={"/auth/login?next=/profile/" + userId}>
+                    <Button size="lg" variant="outline" className="gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Log in to message
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

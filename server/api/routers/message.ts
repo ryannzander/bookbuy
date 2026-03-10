@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 function normalizeThreadUsers(a: string, b: string): [string, string] {
   return a < b ? [a, b] : [b, a];
@@ -72,7 +73,7 @@ export const messageRouter = createTRPCRouter({
     }),
 
   send: protectedProcedure
-    .input(z.object({ threadId: z.string(), body: z.string().min(1).max(1000) }))
+    .input(z.object({ threadId: z.string(), body: z.string().min(1).max(1000).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE) }))
     .mutation(async ({ ctx, input }) => {
       const thread = await ctx.db.messageThread.findUnique({ where: { id: input.threadId } });
       if (!thread || (thread.userAId !== ctx.userId && thread.userBId !== ctx.userId)) {
@@ -95,6 +96,33 @@ export const messageRouter = createTRPCRouter({
         linkUrl: `/messages?thread=${thread.id}`,
       });
       return message;
+    }),
+
+  deleteMessage: protectedProcedure
+    .input(z.object({ messageId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const msg = await ctx.db.message.findUnique({ where: { id: input.messageId }, include: { thread: true } });
+      if (!msg) throw new TRPCError({ code: "NOT_FOUND" });
+      if (msg.senderId !== ctx.userId) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only delete your own messages" });
+      }
+      const { userAId, userBId } = msg.thread;
+      if (userAId !== ctx.userId && userBId !== ctx.userId) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      await ctx.db.message.delete({ where: { id: input.messageId } });
+      return { ok: true };
+    }),
+
+  deleteThread: protectedProcedure
+    .input(z.object({ threadId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const thread = await ctx.db.messageThread.findUnique({ where: { id: input.threadId } });
+      if (!thread || (thread.userAId !== ctx.userId && thread.userBId !== ctx.userId)) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      await ctx.db.messageThread.delete({ where: { id: input.threadId } });
+      return { ok: true };
     }),
 
   markRead: protectedProcedure
