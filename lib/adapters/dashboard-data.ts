@@ -33,13 +33,13 @@ function toListing(input: {
   subject: string;
   condition: string;
   price: { toString(): string } | number;
-  status: "AVAILABLE" | "SOLD" | "AUCTION_ENDED";
+  status: "AVAILABLE" | "SOLD";
   courseCode: string | null;
   description: string | null;
   edition: string | null;
   imageUrls: string | null;
   createdAt: Date;
-  type: "FIXED" | "AUCTION";
+  type: "FIXED";
   isFeatured: boolean;
   viewCount: number;
 }): Listing {
@@ -151,7 +151,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       user: {
         id: me.id,
         name: me.name ?? null,
-        username: (me.name ?? me.email.split("@")[0]).toLowerCase().replace(/\s+/g, ""),
         email: me.email,
         avatarUrl: me.avatarUrl ?? null,
         schoolName: me.schoolName ?? null,

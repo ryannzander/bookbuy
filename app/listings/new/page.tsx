@@ -13,35 +13,22 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { ImageUpload } from "@/components/image-upload";
 
-const schema = z
-  .object({
-    title: z.string().min(1, "Title required"),
-    courseCode: z.string().optional(),
-    author: z.string().min(1, "Author required"),
-    isbn: z.string().min(1, "ISBN required"),
-    condition: z.string().min(1, "Condition required"),
-    subject: z.string().min(1, "Subject required"),
-    edition: z.string().optional(),
-    description: z.string().optional(),
-    price: z.coerce.number().positive("Price must be positive"),
-    type: z.enum(["FIXED", "AUCTION"]),
-    auctionEndsAt: z.string().optional(),
-  })
-  .refine(
-    (data) =>
-      data.type !== "AUCTION" ||
-      (data.auctionEndsAt && new Date(data.auctionEndsAt) > new Date()),
-    {
-      message: "Auction must have an end date in the future",
-      path: ["auctionEndsAt"],
-    }
-  );
+const schema = z.object({
+  title: z.string().min(1, "Title required"),
+  courseCode: z.string().optional(),
+  author: z.string().min(1, "Author required"),
+  isbn: z.string().min(1, "ISBN required"),
+  condition: z.string().min(1, "Condition required"),
+  subject: z.string().min(1, "Subject required"),
+  edition: z.string().optional(),
+  description: z.string().optional(),
+  price: z.coerce.number().positive("Price must be positive"),
+});
 
 type FormData = z.infer<typeof schema>;
 
 export default function NewListingPage() {
   const router = useRouter();
-  const [type, setType] = useState<"FIXED" | "AUCTION">("FIXED");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -55,7 +42,6 @@ export default function NewListingPage() {
       edition: "",
       description: "",
       price: 0,
-      type: "FIXED",
     },
   });
 
@@ -68,9 +54,6 @@ export default function NewListingPage() {
   function onSubmit(values: FormData) {
     create.mutate({
       ...values,
-      auctionEndsAt: values.auctionEndsAt
-        ? new Date(values.auctionEndsAt)
-        : undefined,
       imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined,
     });
   }
@@ -230,38 +213,6 @@ export default function NewListingPage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Listing Type</Label>
-              <input type="hidden" {...form.register("type")} />
-              <select
-                className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all"
-                value={type}
-                onChange={(e) => {
-                  const v = e.target.value as "FIXED" | "AUCTION";
-                  setType(v);
-                  form.setValue("type", v);
-                }}
-              >
-                <option value="FIXED">Buy Now (Fixed Price)</option>
-                <option value="AUCTION">Auction</option>
-              </select>
-            </div>
-
-            {type === "AUCTION" && (
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="auctionEndsAt">Auction End Date & Time</Label>
-                <Input
-                  id="auctionEndsAt"
-                  type="datetime-local"
-                  {...form.register("auctionEndsAt")}
-                />
-                {form.formState.errors.auctionEndsAt && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.auctionEndsAt.message}
-                  </p>
-                )}
-              </div>
-            )}
           </div>
 
           {create.error && (

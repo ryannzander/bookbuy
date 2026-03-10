@@ -1,6 +1,6 @@
 # BuyBook – School Book Exchange
 
-A T3-style book exchange for schools: list textbooks, buy/sell, leave reviews, and run auctions. Built with Next.js, Supabase (Postgres + Auth), Prisma, tRPC, shadcn/ui, and Tailwind.
+A T3-style book exchange for schools: list textbooks and buy/sell. Built with Next.js, Supabase (Postgres + Auth), Prisma, tRPC, shadcn/ui, and Tailwind.
 
 ## Setup
 
@@ -25,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - In the Vercel project, set **Environment Variables**: `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 - Use the same Supabase connection string for `DATABASE_URL` (e.g. from **Settings → Database**; pooler connection is fine).
-- After first deploy, run migrations from your machine with `npm run db:push` (or use Supabase migrations). Optional: add a [Vercel Cron Job](https://vercel.com/docs/cron-jobs) that calls an API route to resolve ended auctions.
+- After first deploy, run migrations from your machine with `npm run db:push` (or use Supabase migrations).
 
 ## Getting Started (dev)
 

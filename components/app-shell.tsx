@@ -27,9 +27,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isBare || isApiRoute) return <>{children}</>;
 
-  const fallbackUser: User = { id: "guest", name: "Guest User", username: "guest", email: "guest@buybook.local", avatarUrl: null, schoolName: null, verified: false, createdAt: new Date().toISOString() };
+  const fallbackUser: User = { id: "guest", name: "Guest User", email: "guest@buybook.local", avatarUrl: null, schoolName: null, verified: false, createdAt: new Date().toISOString() };
   const user: User = me
-    ? { id: me.id, name: me.name ?? null, username: (me.name ?? me.email.split("@")[0]).toLowerCase(), email: me.email, avatarUrl: me.avatarUrl ?? null, schoolName: me.schoolName ?? null, verified: me.verified, createdAt: me.createdAt.toISOString() }
+    ? { id: me.id, name: me.name ?? null, email: me.email, avatarUrl: me.avatarUrl ?? null, schoolName: me.schoolName ?? null, verified: me.verified, createdAt: me.createdAt.toISOString() }
     : fallbackUser;
   const isAdmin = (me as { role?: string } | undefined)?.role === "ADMIN";
 

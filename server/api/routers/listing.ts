@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { ListingType, ListingStatus, type Prisma } from "@prisma/client";
+import { ListingStatus, type Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure, protectedProcedure, sensitiveProcedure } from "@/server/api/trpc";
-import { resolveAuctionIfEnded } from "@/server/api/auction";
 
 function isUTSchoolsEmail(email: string) {
   return email.toLowerCase().endsWith("@utschools.ca");
@@ -189,7 +188,6 @@ export const listingRouter = createTRPCRouter({
         where: { id },
         data: {
           ...data,
-          auctionEndsAt: data.auctionEndsAt ?? undefined,
           imageUrls: data.imageUrls ?? undefined,
         },
       });

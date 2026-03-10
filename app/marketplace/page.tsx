@@ -83,9 +83,6 @@ function MarketplaceContent() {
   );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
-  const [type, setType] = useState<"FIXED" | "AUCTION" | "">(
-    (searchParams.get("type") as "FIXED" | "AUCTION") ?? ""
-  );
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [availability, setAvailability] = useState<
     "available" | "sold" | "all"
@@ -101,12 +98,11 @@ function MarketplaceContent() {
       condition: condition || undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      type: type || undefined,
       search: search.trim() || undefined,
       availability,
       sort,
     }),
-    [subject, courseCode, condition, minPrice, maxPrice, type, search, availability, sort]
+    [subject, courseCode, condition, minPrice, maxPrice, search, availability, sort]
   );
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -122,7 +118,6 @@ function MarketplaceContent() {
     if (condition) params.set("condition", condition);
     if (minPrice) params.set("minPrice", minPrice);
     if (maxPrice) params.set("maxPrice", maxPrice);
-    if (type) params.set("type", type);
     if (search.trim()) params.set("search", search.trim());
     if (availability !== "available") params.set("availability", availability);
     if (sort !== "newest") params.set("sort", sort);
@@ -131,7 +126,7 @@ function MarketplaceContent() {
       "",
       `${window.location.pathname}${params.toString() ? `?${params}` : ""}`
     );
-  }, [subject, courseCode, condition, minPrice, maxPrice, type, search, availability, sort]);
+  }, [subject, courseCode, condition, minPrice, maxPrice, search, availability, sort]);
 
   const applyFilters = () => updateUrl();
 
@@ -141,7 +136,6 @@ function MarketplaceContent() {
     setCondition("");
     setMinPrice("");
     setMaxPrice("");
-    setType("");
     setSearch("");
     setAvailability("available");
     setSort("newest");
@@ -151,7 +145,7 @@ function MarketplaceContent() {
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
   const hasActiveFilters =
-    subject || courseCode || condition || minPrice || maxPrice || type || search;
+    subject || courseCode || condition || minPrice || maxPrice || search;
 
   return (
     <div className="space-y-8">
@@ -230,18 +224,6 @@ function MarketplaceContent() {
                     {c}
                   </option>
                 ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <select
-                className="flex h-12 w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/50 transition-all"
-                value={type}
-                onChange={(e) => setType(e.target.value as "FIXED" | "AUCTION" | "")}
-              >
-                <option value="">Any</option>
-                <option value="FIXED">Buy now</option>
-                <option value="AUCTION">Auction</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -335,20 +317,9 @@ function MarketplaceContent() {
                     {/* Content */}
                     <div className="p-5">
                       <div className="flex items-start justify-between gap-3">
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            listing.type === "AUCTION"
-                              ? "bg-gradient-to-r from-warning/20 to-warning/10 text-warning border border-warning/20"
-                              : "bg-gradient-to-r from-primary/20 to-accent/10 text-primary border border-primary/20"
-                          }`}
-                        >
-                          {listing.type === "AUCTION" ? "Auction" : "Buy Now"}
+                        <span className="rounded-full px-3 py-1 text-xs font-medium bg-gradient-to-r from-primary/20 to-accent/10 text-primary border border-primary/20">
+                          Buy Now
                         </span>
-                        {listing.type === "AUCTION" && listing.bids?.[0] && (
-                          <span className="text-xs font-medium text-muted-foreground">
-                            ${Number(listing.bids[0].amount)} bid
-                          </span>
-                        )}
                       </div>
 
                       <h3 className="mt-3 font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
@@ -362,11 +333,6 @@ function MarketplaceContent() {
                         <span className="text-2xl font-bold gradient-text">
                           ${Number(listing.price)}
                         </span>
-                        {listing.type === "AUCTION" && (
-                          <span className="text-xs text-muted-foreground">
-                            starting bid
-                          </span>
-                        )}
                       </div>
 
                       <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">

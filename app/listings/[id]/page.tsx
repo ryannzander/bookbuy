@@ -6,24 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  BookOpen, Clock, Edit, Flag, Heart, MessageSquare, ShoppingCart,
+  BookOpen, Edit, Flag, Heart, MessageSquare, ShoppingCart,
   Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check,
 } from "lucide-react";
-
-function formatEndsAt(auctionEndsAt: Date | null) {
-  if (!auctionEndsAt) return null;
-  const d = new Date(auctionEndsAt);
-  const now = new Date();
-  if (d <= now) return "Ended";
-  const diff = d.getTime() - now.getTime();
-  const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  if (days > 0) return `${days}d ${hours}h remaining`;
-  if (hours > 0) return `${hours}h remaining`;
-  return `${Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000))}m remaining`;
-}
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -37,13 +23,11 @@ export default function ListingDetailPage() {
   const { data: similar } = api.listing.getSimilar.useQuery({ listingId: id, limit: 4 });
   const utils = api.useUtils();
   const isOwner = me && listing && listing.sellerId === me.id;
-  const [bidAmount, setBidAmount] = useState("");
   const [alertPrice, setAlertPrice] = useState("");
   const [imgIdx, setImgIdx] = useState(0);
   const [copied, setCopied] = useState(false);
 
   const purchaseMutation = api.purchase.purchase.useMutation({ onSuccess: () => { utils.listing.getById.invalidate({ id }); router.push("/dashboard"); } });
-  const bidMutation = api.bid.place.useMutation({ onSuccess: () => { utils.listing.getById.invalidate({ id }); setBidAmount(""); } });
   const createThread = api.message.createThread.useMutation({ onSuccess: (t) => router.push(`/messages?thread=${t.id}`) });
   const reportMutation = api.report.create.useMutation();
   const deleteMutation = api.listing.delete.useMutation({ onSuccess: () => router.push("/dashboard/listings") });
@@ -66,11 +50,6 @@ export default function ListingDetailPage() {
   if (!listing) return <div className="text-center py-20"><p className="text-lg font-semibold text-foreground">Listing not found</p><Link href="/marketplace"><Button variant="outline" className="mt-4">Back to Marketplace</Button></Link></div>;
 
   const isAvailable = listing.status === "AVAILABLE";
-  const isAuction = listing.type === "AUCTION";
-  const highBid = listing.bids[0];
-  const minBid = highBid ? Number(highBid.amount) + 0.01 : Number(listing.price);
-  const endsAtLabel = formatEndsAt(listing.auctionEndsAt);
-  const hasEnded = listing.auctionEndsAt && new Date(listing.auctionEndsAt) <= new Date();
   const images: string[] = listing.imageUrls ? (() => { try { return JSON.parse(listing.imageUrls); } catch { return []; } })() : [];
   const daysSinceUpdate = Math.floor((Date.now() - new Date(listing.updatedAt).getTime()) / (24 * 60 * 60 * 1000));
   const isExpiringSoon = isAvailable && daysSinceUpdate >= 75;
@@ -129,7 +108,7 @@ export default function ListingDetailPage() {
           <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className={`rounded-full px-4 py-1.5 text-sm font-medium ${isAuction ? "bg-warning/20 text-warning" : "bg-secondary text-foreground"}`}>{isAuction ? "Auction" : "Buy Now"}</span>
+                <span className="rounded-full px-4 py-1.5 text-sm font-medium bg-secondary text-foreground">Buy Now</span>
                 {listing.status === "SOLD" && <span className="rounded-full px-4 py-1.5 text-sm font-medium bg-destructive/20 text-destructive">Sold</span>}
                 {isExpiringSoon && <span className="rounded-full px-3 py-1 text-xs font-medium bg-warning/20 text-warning">Expires in {90 - daysSinceUpdate}d</span>}
               </div>
@@ -140,21 +119,13 @@ export default function ListingDetailPage() {
             <h1 className="text-2xl font-bold tracking-tight text-foreground leading-tight">{listing.title}</h1>
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-bold text-foreground">${Number(listing.price)}</span>
-              {isAuction && highBid && <span className="text-muted-foreground">Current bid: ${Number(highBid.amount)}</span>}
             </div>
-            {isAuction && endsAtLabel && <div className={`flex items-center gap-2 ${hasEnded ? "text-muted-foreground" : "text-warning"}`}><Clock className="h-5 w-5" /><span className="font-medium">{endsAtLabel}</span></div>}
 
             <div className="space-y-3">
-              {isAvailable && listing.type === "FIXED" && !isOwner && (
+              {isAvailable && !isOwner && (
                 <>
                   <Button size="lg" className="w-full gap-2" onClick={() => purchaseMutation.mutate({ listingId: id })} disabled={purchaseMutation.isPending}><ShoppingCart className="h-5 w-5" />{purchaseMutation.isPending ? "..." : "Pay in person"}</Button>
                 </>
-              )}
-              {isAvailable && isAuction && !hasEnded && !isOwner && (
-                <div className="space-y-3">
-                  <div className="space-y-2"><Label>Place a bid (min ${minBid.toFixed(2)})</Label><div className="flex gap-2"><Input type="number" min={minBid} step={0.01} value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder={minBid.toFixed(2)} /><Button onClick={() => bidMutation.mutate({ listingId: id, amount: Number(bidAmount) })} disabled={!bidAmount || Number(bidAmount) < minBid || bidMutation.isPending}>{bidMutation.isPending ? "..." : "Bid"}</Button></div></div>
-                  {bidMutation.error && <p className="text-sm text-destructive">{bidMutation.error.message}</p>}
-                </div>
               )}
               {!isOwner && me && (
                 <div className="flex gap-2">
@@ -173,7 +144,6 @@ export default function ListingDetailPage() {
             </div>
             {purchaseMutation.error && <p className="text-sm text-destructive">{purchaseMutation.error.message}</p>}
             {listing.status === "SOLD" && <p className="text-muted-foreground text-center">This item has been sold.</p>}
-            {listing.status === "AUCTION_ENDED" && <p className="text-muted-foreground text-center">Auction ended.{highBid && ` Winner: ${highBid.user.name ?? "Highest bidder"}`}</p>}
           </div>
 
           {/* Price Alert */}

@@ -23,9 +23,7 @@ const schema = z.object({
   edition: z.string().optional(),
   description: z.string().optional(),
   price: z.coerce.number().positive("Price must be positive"),
-  type: z.enum(["FIXED", "AUCTION"]),
-  auctionEndsAt: z.string().optional(),
-}).refine((d) => d.type !== "AUCTION" || (d.auctionEndsAt && new Date(d.auctionEndsAt) > new Date()), { message: "Auction must have an end date in the future", path: ["auctionEndsAt"] });
+});
 
 type FormData = z.infer<typeof schema>;
 
@@ -34,27 +32,24 @@ export default function EditListingPage() {
   const router = useRouter();
   const id = params.id as string;
   const { data: listing, isLoading } = api.listing.getById.useQuery({ id });
-  const [type, setType] = useState<"FIXED" | "AUCTION">("FIXED");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const form = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { title: "", courseCode: "", author: "", isbn: "", condition: "", subject: "", edition: "", description: "", price: 0, type: "FIXED" } });
+  const form = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { title: "", courseCode: "", author: "", isbn: "", condition: "", subject: "", edition: "", description: "", price: 0 } });
 
   useEffect(() => {
     if (!listing) return;
     if (listing.status !== "AVAILABLE") { router.replace(`/listings/${id}`); return; }
-    setType(listing.type as "FIXED" | "AUCTION");
     if (listing.imageUrls) { try { setImageUrls(JSON.parse(listing.imageUrls)); } catch {} }
     form.reset({
       title: listing.title, courseCode: listing.courseCode ?? "", author: listing.author, isbn: listing.isbn,
       condition: listing.condition, subject: listing.subject, edition: listing.edition ?? "", description: listing.description ?? "",
-      price: Number(listing.price), type: listing.type as "FIXED" | "AUCTION",
-      auctionEndsAt: listing.auctionEndsAt ? new Date(listing.auctionEndsAt).toISOString().slice(0, 16) : "",
+      price: Number(listing.price),
     });
   }, [listing, id, router, form]);
 
   const update = api.listing.update.useMutation({ onSuccess: () => router.push(`/listings/${id}`) });
 
   function onSubmit(values: FormData) {
-    update.mutate({ id, ...values, auctionEndsAt: values.auctionEndsAt ? new Date(values.auctionEndsAt) : undefined, imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined });
+    update.mutate({ id, ...values, imageUrls: imageUrls.length > 0 ? JSON.stringify(imageUrls) : undefined });
   }
 
   if (isLoading) return <div className="flex items-center justify-center py-20"><div className="flex items-center gap-3 text-muted-foreground"><div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />Loading...</div></div>;
@@ -85,8 +80,6 @@ export default function EditListingPage() {
             <div className="space-y-2"><Label>Edition</Label><Input {...form.register("edition")} /></div>
             <div className="space-y-2 sm:col-span-2"><Label>Description</Label><textarea {...form.register("description")} rows={4} className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all resize-none" /></div>
             <div className="space-y-2"><Label>Price ($)</Label><Input type="number" step={0.01} {...form.register("price")} />{form.formState.errors.price && <p className="text-sm text-destructive">{form.formState.errors.price.message}</p>}</div>
-            <div className="space-y-2"><Label>Type</Label><input type="hidden" {...form.register("type")} /><select className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-sm focus:border-foreground focus:outline-none transition-all" value={type} onChange={(e) => { const v = e.target.value as "FIXED" | "AUCTION"; setType(v); form.setValue("type", v); }}><option value="FIXED">Buy Now</option><option value="AUCTION">Auction</option></select></div>
-            {type === "AUCTION" && <div className="space-y-2 sm:col-span-2"><Label>Auction End</Label><Input type="datetime-local" {...form.register("auctionEndsAt")} />{form.formState.errors.auctionEndsAt && <p className="text-sm text-destructive">{form.formState.errors.auctionEndsAt.message}</p>}</div>}
           </div>
 
           {update.error && <p className="text-sm text-destructive">{update.error.message}</p>}

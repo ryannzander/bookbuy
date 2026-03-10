@@ -1,7 +1,6 @@
 export interface User {
   id: string;
   name: string | null;
-  username: string;
   email: string;
   avatarUrl: string | null;
   schoolName: string | null;
@@ -26,8 +25,8 @@ export interface ListingImage {
   position: number;
 }
 
-export type ListingStatus = "AVAILABLE" | "SOLD" | "AUCTION_ENDED";
-export type ListingType = "FIXED" | "AUCTION";
+export type ListingStatus = "AVAILABLE" | "SOLD";
+export type ListingType = "FIXED";
 
 export interface Listing {
   id: string;

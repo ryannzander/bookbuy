@@ -16,7 +16,6 @@ export const authRouter = createTRPCRouter({
           email: input.email,
           name: input.name ?? null,
           avatarUrl: input.avatarUrl ?? null,
-          username: input.email.split("@")[0],
           verified: isUTSchoolsEmail(input.email),
         },
         update: {
@@ -38,7 +37,6 @@ export const authRouter = createTRPCRouter({
   updateProfile: protectedProcedure
     .input(
       z.object({
-        username: z.string().min(3).max(30),
         schoolName: z.string().min(2).max(80).optional(),
       })
     )
@@ -46,7 +44,6 @@ export const authRouter = createTRPCRouter({
       return ctx.db.user.update({
         where: { id: ctx.userId },
         data: {
-          username: input.username.toLowerCase(),
           schoolName: input.schoolName ?? null,
         },
       });
