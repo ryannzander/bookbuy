@@ -46,7 +46,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               { href: "/dashboard/orders", label: "Orders" },
               { href: "/messages", label: "Messages" },
               { href: "/wishlist", label: "Saved" },
-              { href: "/courses", label: "Courses" },
               { href: "/notifications", label: `Alerts${unreadCount > 0 ? ` (${unreadCount})` : ""}` },
               { href: "/settings", label: "Settings" },
               ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),

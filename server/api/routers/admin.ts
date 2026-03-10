@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   const user = await ctx.db.user.findUnique({ where: { id: ctx.userId }, select: { role: true } });
@@ -65,4 +66,38 @@ export const adminRouter = createTRPCRouter({
     await ctx.db.notification.create({ data: { userId: listing.sellerId, type: "LISTING_REMOVED", title: "Listing Removed", body: `Your listing "${listing.title}" was removed for policy violations.` } });
     return { ok: true };
   }),
+
+  deleteUser: adminProcedure.input(z.object({ userId: z.string() })).mutation(async ({ ctx, input }) => {
+    if (input.userId === ctx.userId) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot delete your own account." });
+    }
+    const target = await ctx.db.user.findUnique({ where: { id: input.userId }, select: { role: true } });
+    if (target?.role === "ADMIN") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete another admin." });
+    }
+    await ctx.db.user.delete({ where: { id: input.userId } });
+    const admin = createAdminClient();
+    if (admin) {
+      try {
+        await admin.auth.admin.deleteUser(input.userId);
+      } catch {
+        // Supabase auth delete may fail; DB user is already gone
+      }
+    }
+    return { ok: true };
+  }),
+
+  getListings: adminProcedure
+    .input(z.object({ search: z.string().optional(), limit: z.number().min(1).max(100).default(50) }))
+    .query(async ({ ctx, input }) => {
+      const where = input.search
+        ? { OR: [{ title: { contains: input.search, mode: "insensitive" as const } }, { author: { contains: input.search, mode: "insensitive" as const } }] }
+        : {};
+      return ctx.db.listing.findMany({
+        where,
+        include: { seller: { select: { id: true, name: true, email: true } } },
+        orderBy: { createdAt: "desc" },
+        take: input.limit,
+      });
+    }),
 });

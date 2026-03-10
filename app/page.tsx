@@ -55,16 +55,6 @@ export default function LandingPage() {
             {/* Stats */}
             <LandingStats />
           </div>
-
-            {/* Right Column - Stats */}
-            <div className="lg:text-right lg:pt-16 animate-fade-in delay-200">
-              <p className="text-sm text-white/50 uppercase tracking-wider mb-2">
-                Savings by Students
-              </p>
-              <p className="text-5xl sm:text-6xl lg:text-7xl font-light text-white">
-                $<span className="text-[#5eead4]">45K</span>+
-              </p>
-            </div>
           </div>
         </div>
       </section>

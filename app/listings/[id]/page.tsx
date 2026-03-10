@@ -6,9 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   BookOpen, Edit, Flag, Heart, MessageSquare, ShoppingCart,
-  Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check,
+  Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check, X,
 } from "lucide-react";
 
 export default function ListingDetailPage() {
@@ -26,10 +27,19 @@ export default function ListingDetailPage() {
   const [alertPrice, setAlertPrice] = useState("");
   const [imgIdx, setImgIdx] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
 
   const purchaseMutation = api.purchase.purchase.useMutation({ onSuccess: () => { utils.listing.getById.invalidate({ id }); router.push("/dashboard"); } });
   const createThread = api.message.createThread.useMutation({ onSuccess: (t) => router.push(`/messages?thread=${t.id}`) });
-  const reportMutation = api.report.create.useMutation();
+  const reportMutation = api.report.create.useMutation({
+    onSuccess: () => {
+      setReportOpen(false);
+      setReportReason("");
+      setReportDetails("");
+    },
+  });
   const deleteMutation = api.listing.delete.useMutation({ onSuccess: () => router.push("/dashboard/listings") });
   const wishlistToggle = api.wishlist.toggle.useMutation({ onSuccess: () => utils.wishlist.isSaved.invalidate({ listingId: id }) });
   const setAlert = api.price.setAlert.useMutation({ onSuccess: () => { utils.price.getAlert.invalidate({ listingId: id }); setAlertPrice(""); } });
@@ -172,10 +182,94 @@ export default function ListingDetailPage() {
                 <p className="font-medium text-foreground">{listing.seller.name ?? listing.seller.email ?? "Seller"}</p>
               </div>
             </Link>
-            {!isOwner && <Button variant="ghost" size="sm" className="w-full gap-2 text-muted-foreground hover:text-destructive" onClick={() => reportMutation.mutate({ targetUserId: listing.seller.id, listingId: listing.id, reason: "Suspicious listing" })} disabled={reportMutation.isPending || reportMutation.isSuccess}><Flag className="h-4 w-4" />{reportMutation.isSuccess ? "Reported" : "Report Listing"}</Button>}
+            {!isOwner && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full gap-2 text-muted-foreground hover:text-destructive"
+                onClick={() => setReportOpen(true)}
+                disabled={reportMutation.isSuccess}
+              >
+                <Flag className="h-4 w-4" />
+                {reportMutation.isSuccess ? "Reported" : "Report Listing"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {reportOpen && listing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="flex flex-col w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Flag className="h-5 w-5" /> Report Listing
+              </h3>
+              <button onClick={() => setReportOpen(false)} className="rounded-lg p-2 hover:bg-secondary text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Report &quot;{listing.title}&quot; for policy violations. Your report will be reviewed by moderators.
+            </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reportReason">Reason (required)</Label>
+                <select
+                  id="reportReason"
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="">Select a reason</option>
+                  <option value="Suspicious or fraudulent">Suspicious or fraudulent</option>
+                  <option value="Inappropriate content">Inappropriate content</option>
+                  <option value="Wrong category or misleading">Wrong category or misleading</option>
+                  <option value="Spam or duplicate">Spam or duplicate</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="reportDetails">Additional details (optional)</Label>
+                <Input
+                  id="reportDetails"
+                  placeholder="Provide more context..."
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  maxLength={1000}
+                  className="resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <Button variant="outline" className="flex-1" onClick={() => setReportOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 gap-2"
+                onClick={() => {
+                  if (reportReason.trim().length >= 3) {
+                    reportMutation.mutate({
+                      targetUserId: listing.seller.id,
+                      listingId: listing.id,
+                      reason: reportReason.trim(),
+                      details: reportDetails.trim() || undefined,
+                    });
+                  }
+                }}
+                disabled={reportMutation.isPending || reportReason.trim().length < 3}
+              >
+                <Flag className="h-4 w-4" />
+                {reportMutation.isPending ? "Submitting..." : "Submit Report"}
+              </Button>
+            </div>
+            {reportMutation.error && (
+              <p className="mt-3 text-sm text-destructive">{reportMutation.error.message}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Similar Books */}
       {similar && similar.length > 0 && (

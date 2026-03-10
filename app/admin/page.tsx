@@ -14,6 +14,7 @@ export default function AdminPage() {
 
   const [reportFilter, setReportFilter] = useState<string | undefined>(undefined);
   const [userSearch, setUserSearch] = useState("");
+  const [listingsSearch, setListingsSearch] = useState("");
 
   const { data: stats } = api.admin.stats.useQuery(undefined, {
     retry: false,
@@ -27,6 +28,10 @@ export default function AdminPage() {
     { search: userSearch || undefined },
     { retry: false, enabled: !!isAdmin }
   );
+  const { data: listings } = api.admin.getListings.useQuery(
+    { search: listingsSearch || undefined },
+    { retry: false, enabled: !!isAdmin }
+  );
 
   const utils = api.useUtils();
   const updateReport = api.admin.updateReport.useMutation({
@@ -38,8 +43,14 @@ export default function AdminPage() {
   const banUser = api.admin.banUser.useMutation({
     onSuccess: () => utils.admin.getUsers.invalidate(),
   });
+  const deleteUser = api.admin.deleteUser.useMutation({
+    onSuccess: () => utils.admin.getUsers.invalidate(),
+  });
   const removeListing = api.admin.removeListing.useMutation({
-    onSuccess: () => utils.admin.stats.invalidate(),
+    onSuccess: () => {
+      utils.admin.stats.invalidate();
+      utils.admin.getListings.invalidate();
+    },
   });
 
   useEffect(() => {
@@ -235,6 +246,7 @@ export default function AdminPage() {
                 <th className="text-center py-3 px-2 font-medium">Listings</th>
                 <th className="text-center py-3 px-2 font-medium">Sales</th>
                 <th className="text-left py-3 px-2 font-medium">Joined</th>
+                <th className="text-right py-3 px-2 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -260,11 +272,92 @@ export default function AdminPage() {
                   <td className="py-3 px-2 text-muted-foreground text-xs">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
+                  <td className="py-3 px-2 text-right">
+                    {u.role !== "ADMIN" && u.id !== me?.id && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm(`Permanently delete ${u.name ?? u.email}? This cannot be undone.`)) {
+                            deleteUser.mutate({ userId: u.id });
+                          }
+                        }}
+                        disabled={deleteUser.isPending}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <BookOpen className="h-5 w-5" /> Listings
+          </h2>
+          <div className="relative w-60">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by title or author..."
+              value={listingsSearch}
+              onChange={(e) => setListingsSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="text-left py-3 px-2 font-medium">Listing</th>
+                <th className="text-left py-3 px-2 font-medium">Seller</th>
+                <th className="text-left py-3 px-2 font-medium">Price</th>
+                <th className="text-left py-3 px-2 font-medium">Status</th>
+                <th className="text-right py-3 px-2 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {listings?.map((l) => (
+                <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50">
+                  <td className="py-3 px-2">
+                    <p className="font-medium text-foreground line-clamp-1">{l.title}</p>
+                    <p className="text-xs text-muted-foreground">{l.author}</p>
+                  </td>
+                  <td className="py-3 px-2">
+                    <p className="text-foreground">{l.seller.name ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground">{l.seller.email}</p>
+                  </td>
+                  <td className="py-3 px-2">${Number(l.price)}</td>
+                  <td className="py-3 px-2">
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${l.status === "AVAILABLE" ? "bg-success/20 text-success" : "bg-secondary text-muted-foreground"}`}>
+                      {l.status}
+                    </span>
+                  </td>
+                  <td className="py-3 px-2 text-right">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => {
+                        if (confirm(`Remove listing "${l.title}"? Seller will be notified.`)) {
+                          removeListing.mutate({ listingId: l.id });
+                        }
+                      }}
+                      disabled={removeListing.isPending}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {listings?.length === 0 && <p className="text-muted-foreground py-6 text-center">No listings found.</p>}
       </div>
     </div>
   );
