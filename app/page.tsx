@@ -82,7 +82,6 @@ export default function LandingPage() {
               number="04"
               title="Trusted Reviews"
               description="Ratings help you find reliable sellers. Build your reputation with each successful trade."
-              showDescription
             />
           </div>
         </div>
@@ -96,7 +95,7 @@ export default function LandingPage() {
               Ready to save on textbooks?
             </h2>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
-              Join students trading textbooks at your school.
+              Join students selling textbooks at your school.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Link href="/auth/signup">
