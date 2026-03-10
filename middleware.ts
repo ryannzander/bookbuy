@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
   const isEditListing = /^\/listings\/[^/]+\/edit$/.test(path);
   if ((isProtected || isEditListing) && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/signup";
+    url.pathname = "/auth/login";
     url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
