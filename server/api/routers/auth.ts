@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 function isUTSchoolsEmail(email: string) {
   return email.toLowerCase().endsWith("@utschools.ca");
@@ -7,7 +8,7 @@ function isUTSchoolsEmail(email: string) {
 
 export const authRouter = createTRPCRouter({
   syncUser: protectedProcedure
-    .input(z.object({ email: z.string().email(), name: z.string().optional(), avatarUrl: z.string().optional() }))
+    .input(z.object({ email: z.string().email(), name: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE), avatarUrl: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.user.upsert({
         where: { id: ctx.userId },
@@ -38,8 +39,8 @@ export const authRouter = createTRPCRouter({
   updateProfile: protectedProcedure
     .input(
       z.object({
-        username: z.string().min(3).max(30),
-        schoolName: z.string().min(2).max(80).optional(),
+        username: z.string().min(3).max(30).refine((s) => !containsProfanity(s), PROFANITY_MESSAGE),
+        schoolName: z.string().min(2).max(80).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
       })
     )
     .mutation(async ({ ctx, input }) => {

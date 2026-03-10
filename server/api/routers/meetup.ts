@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { MeetupStatus, PurchaseStatus } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 export const meetupRouter = createTRPCRouter({
   schedule: protectedProcedure
@@ -11,7 +12,7 @@ export const meetupRouter = createTRPCRouter({
         purchaseId: z.string(),
         startTime: z.coerce.date(),
         endTime: z.coerce.date().optional(),
-        location: z.string().min(2).max(200).optional(),
+        location: z.string().min(2).max(200).optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
       })
     )
     .mutation(async ({ ctx, input }) => {

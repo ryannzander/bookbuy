@@ -2,13 +2,14 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createNotification } from "@/server/api/notifications";
+import { containsProfanity, PROFANITY_MESSAGE } from "@/lib/profanity";
 
 export const reviewRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({
       purchaseId: z.string(),
       rating: z.number().min(1).max(5),
-      comment: z.string().optional(),
+      comment: z.string().optional().refine((s) => !s || !containsProfanity(s), PROFANITY_MESSAGE),
     }))
     .mutation(async ({ ctx, input }) => {
       const purchase = await ctx.db.purchase.findUnique({
