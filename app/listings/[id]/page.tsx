@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  BookOpen, Clock, Edit, Flag, Heart, MessageSquare, ShoppingCart, Star,
+  BookOpen, Clock, Edit, Flag, Heart, MessageSquare, ShoppingCart,
   Trash2, User, Bell, BellOff, ChevronLeft, ChevronRight, TrendingDown, Share2, Copy, Check,
 } from "lucide-react";
 
@@ -71,8 +71,6 @@ export default function ListingDetailPage() {
   const minBid = highBid ? Number(highBid.amount) + 0.01 : Number(listing.price);
   const endsAtLabel = formatEndsAt(listing.auctionEndsAt);
   const hasEnded = listing.auctionEndsAt && new Date(listing.auctionEndsAt) <= new Date();
-  const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
-  const sellerAvgRating = sellerReviewCount > 0 ? listing.seller.reviewsReceived.reduce((s, r) => s + r.rating, 0) / sellerReviewCount : null;
   const images: string[] = listing.imageUrls ? (() => { try { return JSON.parse(listing.imageUrls); } catch { return []; } })() : [];
   const daysSinceUpdate = Math.floor((Date.now() - new Date(listing.updatedAt).getTime()) / (24 * 60 * 60 * 1000));
   const isExpiringSoon = isAvailable && daysSinceUpdate >= 75;
@@ -202,7 +200,6 @@ export default function ListingDetailPage() {
               <div className="h-12 w-12 rounded-full bg-foreground text-background flex items-center justify-center font-bold">{listing.seller.name?.[0]?.toUpperCase() ?? <User className="h-5 w-5" />}</div>
               <div>
                 <p className="font-medium text-foreground">{listing.seller.name ?? "Seller"}</p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">{sellerAvgRating != null ? <><Star className="h-4 w-4 fill-current" /><span>{sellerAvgRating.toFixed(1)} ({sellerReviewCount} reviews)</span></> : <span>No reviews yet</span>}</div>
               </div>
             </Link>
             {!isOwner && <Button variant="ghost" size="sm" className="w-full gap-2 text-muted-foreground hover:text-destructive" onClick={() => reportMutation.mutate({ targetUserId: listing.seller.id, listingId: listing.id, reason: "Suspicious listing" })} disabled={reportMutation.isPending || reportMutation.isSuccess}><Flag className="h-4 w-4" />{reportMutation.isSuccess ? "Reported" : "Report Listing"}</Button>}

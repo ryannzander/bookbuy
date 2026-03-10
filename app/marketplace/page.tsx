@@ -7,7 +7,7 @@ import { api } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Filter, Search, Star, X } from "lucide-react";
+import { BookOpen, Filter, Search, X } from "lucide-react";
 
 function SearchAutocomplete({ value, onChange, onSubmit }: { value: string; onChange: (v: string) => void; onSubmit: () => void }) {
   const [query, setQuery] = useState(value);
@@ -321,17 +321,7 @@ function MarketplaceContent() {
       ) : (
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((listing) => {
-              const sellerReviewCount = listing.seller.reviewsReceived?.length ?? 0;
-              const sellerAvgRating =
-                sellerReviewCount > 0
-                  ? listing.seller.reviewsReceived.reduce(
-                      (sum, review) => sum + review.rating,
-                      0
-                    ) / sellerReviewCount
-                  : null;
-
-              return (
+            {items.map((listing) => (
                 <Link
                   key={listing.id}
                   href={`/listings/${listing.id}`}
@@ -386,22 +376,15 @@ function MarketplaceContent() {
                         <span>{listing.subject}</span>
                       </div>
 
-                      <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+                      <div className="mt-4 pt-4 border-t border-border/50">
                         <span className="text-sm text-muted-foreground">
                           {listing.seller.name ?? "Seller"}
                         </span>
-                        {sellerAvgRating != null && (
-                          <span className="flex items-center gap-1 text-xs text-primary">
-                            <Star className="h-3 w-3 fill-current" />
-                            {sellerAvgRating.toFixed(1)}
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
                 </Link>
-              );
-            })}
+            ))}
           </div>
 
           {hasNextPage && (

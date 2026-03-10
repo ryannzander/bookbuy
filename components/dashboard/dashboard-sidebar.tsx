@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, BookOpen, List, MessageSquare, Gavel, Bell, ArrowRightLeft,
-  Flag, Trophy, Settings, Plus, Heart, GraduationCap, Shield, Zap,
+  LayoutDashboard, BookOpen, List, MessageSquare, Bell, ArrowRightLeft,
+  Flag, Trophy, Settings, Plus, Heart, GraduationCap, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,10 +16,8 @@ const baseNavItems = [
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/wishlist", label: "Saved Books", icon: Heart },
   { href: "/courses", label: "My Courses", icon: GraduationCap },
-  { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/dashboard/reports", label: "Reports", icon: Flag },
-  { href: "/pricing", label: "Pricing", icon: Zap },
 ] as const;
 
 export function DashboardSidebar({

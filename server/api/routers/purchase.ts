@@ -14,7 +14,7 @@ export const purchaseRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const listing = await ctx.db.listing.findUnique({
         where: { id: input.listingId },
-        include: { seller: { select: { id: true, plan: true } } },
+        include: { seller: { select: { id: true } } },
       });
       if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
       if (listing.status !== ListingStatus.AVAILABLE) {
@@ -27,8 +27,7 @@ export const purchaseRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot buy your own listing" });
       }
       const priceCents = Math.round(Number(listing.price) * 100);
-      const isProSeller = listing.seller.plan === "PRO";
-      const platformFeeCents = computePlatformFeeCents(priceCents, isProSeller);
+      const platformFeeCents = computePlatformFeeCents(priceCents);
 
       const [purchase] = await ctx.db.$transaction([
         ctx.db.purchase.create({
@@ -58,7 +57,7 @@ export const purchaseRouter = createTRPCRouter({
         userId: ctx.userId,
         type: "PURCHASE",
         title: "Purchase confirmed",
-        body: `You bought "${listing.title}". Contact seller to arrange payment. Leave a review after you're done!`,
+        body: `You bought "${listing.title}". Contact seller to arrange payment.`,
         linkUrl: `/dashboard`,
       });
       return purchase;
@@ -69,7 +68,6 @@ export const purchaseRouter = createTRPCRouter({
       where: { buyerId: ctx.userId },
       include: {
         listing: { include: { seller: { select: { id: true, name: true } } } },
-        review: true,
         meetup: true,
       },
       orderBy: { purchasedAt: "desc" },

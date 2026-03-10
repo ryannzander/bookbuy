@@ -12,21 +12,10 @@ export const sellerRouter = createTRPCRouter({
         select: { id: true, name: true, avatarUrl: true, createdAt: true, verified: true, schoolName: true },
       });
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
-      const [listings, reviewsReceived] = await Promise.all([
-        ctx.db.listing.findMany({
-          where: { sellerId: input.userId, status: ListingStatus.AVAILABLE },
-          orderBy: { createdAt: "desc" },
-        }),
-        ctx.db.review.findMany({
-          where: { sellerId: input.userId },
-          include: { buyer: { select: { id: true, name: true } }, purchase: { include: { listing: { select: { title: true } } } } },
-          orderBy: { createdAt: "desc" },
-        }),
-      ]);
-      const avgRating =
-        reviewsReceived.length > 0
-          ? reviewsReceived.reduce((s, r) => s + r.rating, 0) / reviewsReceived.length
-          : null;
+      const listings = await ctx.db.listing.findMany({
+        where: { sellerId: input.userId, status: ListingStatus.AVAILABLE },
+        orderBy: { createdAt: "desc" },
+      });
       const threads = await ctx.db.messageThread.findMany({
         where: { OR: [{ userAId: input.userId }, { userBId: input.userId }] },
         include: {
@@ -46,7 +35,7 @@ export const sellerRouter = createTRPCRouter({
         }
       }
       const avgResponseMinutes = responseCount > 0 ? Math.round(totalResponseMs / responseCount / 60000) : null;
-      return { user, listings, reviewsReceived, avgRating, avgResponseMinutes };
+      return { user, listings, avgResponseMinutes };
     }),
 
   getLeaderboard: publicProcedure
@@ -60,7 +49,6 @@ export const sellerRouter = createTRPCRouter({
           avatarUrl: true,
           verified: true,
           schoolName: true,
-          reviewsReceived: { select: { rating: true } },
           sales: {
             where: { status: PurchaseStatus.COMPLETED },
             select: { id: true },
@@ -74,15 +62,10 @@ export const sellerRouter = createTRPCRouter({
 
       const ranked = sellers
         .map((seller) => {
-          const reviewCount = seller.reviewsReceived.length;
-          const averageRating =
-            reviewCount > 0
-              ? seller.reviewsReceived.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-              : 0;
           const salesCount = seller.sales.length;
           const activeListings = seller.listings.length;
           const trustBonus = seller.verified ? 5 : 0;
-          const score = averageRating * 20 + salesCount * 3 + reviewCount * 2 + trustBonus;
+          const score = salesCount * 3 + activeListings + trustBonus;
 
           return {
             id: seller.id,
@@ -90,14 +73,12 @@ export const sellerRouter = createTRPCRouter({
             avatarUrl: seller.avatarUrl,
             verified: seller.verified,
             schoolName: seller.schoolName,
-            averageRating,
-            reviewCount,
             salesCount,
             activeListings,
             score,
           };
         })
-        .filter((seller) => seller.salesCount > 0 || seller.reviewCount > 0 || seller.activeListings > 0)
+        .filter((seller) => seller.salesCount > 0 || seller.activeListings > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, limit);
 

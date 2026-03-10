@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { ListingStatus } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { getStripe, getStripePublishableKey } from "@/lib/stripe";
-import { BOOST_PRICE_CENTS, BOOST_DAYS, computePlatformFeeCents } from "@/lib/monetization";
+import { BOOST_PRICE_CENTS, BOOST_DAYS, PLATFORM_FEE_PERCENT } from "@/lib/monetization";
 
 const getBaseUrl = () => {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
@@ -16,7 +16,7 @@ export const stripeRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const listing = await ctx.db.listing.findUnique({
         where: { id: input.listingId },
-        include: { seller: { select: { id: true, plan: true } } },
+        select: { id: true, title: true, author: true, condition: true, imageUrls: true, price: true, sellerId: true, status: true },
       });
       if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
       if (listing.status !== ListingStatus.AVAILABLE) {
@@ -26,8 +26,7 @@ export const stripeRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot buy your own listing" });
       }
       const amountCents = Math.round(Number(listing.price) * 100);
-      const isPro = listing.seller.plan === "PRO";
-      const feeCents = computePlatformFeeCents(amountCents, isPro);
+      const feeCents = Math.round((amountCents * PLATFORM_FEE_PERCENT) / 100);
 
       const session = await getStripe().checkout.sessions.create({
         mode: "payment",
@@ -99,21 +98,6 @@ export const stripeRouter = createTRPCRouter({
 
       return { url: session.url!, sessionId: session.id };
     }),
-
-  createBillingPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
-    const user = await ctx.db.user.findUnique({
-      where: { id: ctx.userId },
-      select: { stripeCustomerId: true },
-    });
-    if (!user?.stripeCustomerId) {
-      throw new TRPCError({ code: "BAD_REQUEST", message: "No billing account found" });
-    }
-    const session = await getStripe().billingPortal.sessions.create({
-      customer: user.stripeCustomerId,
-      return_url: `${getBaseUrl()}/settings`,
-    });
-    return { url: session.url };
-  }),
 
   publishableKey: protectedProcedure.query(() => getStripePublishableKey()),
 });

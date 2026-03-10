@@ -17,7 +17,7 @@ export default function SellerPage() {
     return <p>Seller not found.</p>;
   }
 
-  const { user, listings, reviewsReceived, avgRating } = data;
+  const { user, listings } = data;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -36,11 +36,6 @@ export default function SellerPage() {
                   <span className="text-xs text-muted-foreground">{user.schoolName}</span>
                 )}
               </div>
-              {avgRating != null && (
-                <p className="text-muted-foreground">
-                  {avgRating.toFixed(1)} / 5 ({reviewsReceived.length} reviews)
-                </p>
-              )}
             </div>
           </div>
         </CardHeader>
@@ -65,37 +60,6 @@ export default function SellerPage() {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="mb-4 text-lg font-semibold">Reviews</h2>
-        {reviewsReceived.length === 0 ? (
-          <p className="text-muted-foreground">No reviews yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {reviewsReceived.map((review) => (
-              <Card key={review.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <span className="font-medium">{review.buyer.name ?? "Buyer"}</span>
-                    <span className="text-sm text-muted-foreground">{review.rating} stars</span>
-                  </div>
-                  {review.purchase?.listing?.title && (
-                    <p className="text-xs text-muted-foreground">
-                      For: {review.purchase.listing.title}
-                    </p>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  {review.comment && <p className="text-sm">{review.comment}</p>}
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </p>
-                </CardContent>
-              </Card>
             ))}
           </div>
         )}

@@ -86,40 +86,7 @@ export async function POST(req: Request) {
             where: { id: listingId },
             data: { isFeatured: true, featuredUntil: end },
           });
-        } else if (type === "subscription") {
-          const userId = session.metadata?.userId;
-          const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
-          const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
-          if (!userId) break;
-          await db.user.update({
-            where: { id: userId },
-            data: {
-              plan: "PRO",
-              stripeCustomerId: customerId ?? undefined,
-              stripeSubscriptionId: subscriptionId ?? undefined,
-            },
-          });
         }
-        break;
-      }
-
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted": {
-        const sub = event.data.object as Stripe.Subscription;
-        const subscriptionId = sub.id;
-        const user = await db.user.findFirst({
-          where: { stripeSubscriptionId: subscriptionId },
-          select: { id: true },
-        });
-        if (!user) break;
-        const active = sub.status === "active" || sub.status === "trialing";
-        await db.user.update({
-          where: { id: user.id },
-          data: {
-            plan: active ? "PRO" : "FREE",
-            stripeSubscriptionId: active ? subscriptionId : null,
-          },
-        });
         break;
       }
 

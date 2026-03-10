@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy, Star, TrendingUp, BookOpen, Shield } from "lucide-react";
+import { Trophy, TrendingUp, BookOpen, Shield } from "lucide-react";
 import { api } from "@/lib/trpc/client";
 import { EmptyState } from "@/components/shared/empty-state";
 
@@ -30,7 +30,7 @@ export default function LeaderboardPage() {
         </div>
         <h1 className="text-3xl font-bold text-foreground">Top Sellers</h1>
         <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-          Ranked by review quality, completed sales, and reputation
+          Ranked by completed sales and reputation
         </p>
       </div>
 
@@ -96,13 +96,6 @@ export default function LeaderboardPage() {
                     {/* Stats */}
                     <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1.5">
-                        <Star className="h-4 w-4 fill-current text-foreground" />
-                        <span className="font-medium text-foreground">
-                          {seller.averageRating.toFixed(1)}
-                        </span>
-                        / 5
-                      </span>
-                      <span className="flex items-center gap-1.5">
                         <TrendingUp className="h-4 w-4" />
                         {seller.salesCount} sales
                       </span>
@@ -110,7 +103,6 @@ export default function LeaderboardPage() {
                         <BookOpen className="h-4 w-4" />
                         {seller.activeListings} active
                       </span>
-                      <span>{seller.reviewCount} reviews</span>
                     </div>
                   </div>
 

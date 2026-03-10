@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Clock3, Star, TrendingUp } from "lucide-react";
+import { BookOpen, Clock3, TrendingUp } from "lucide-react";
 import type { DashboardStats } from "@/types/entities";
 
 export function StatsCards({ stats }: { stats: DashboardStats }) {
@@ -18,14 +18,6 @@ export function StatsCards({ stats }: { stats: DashboardStats }) {
       icon: TrendingUp,
       gradient: "from-success/20 to-success/5",
       iconBg: "from-success to-success/80",
-    },
-    {
-      label: "Seller Rating",
-      value: stats.averageRating ? `${stats.averageRating.toFixed(1)}` : "N/A",
-      icon: Star,
-      suffix: stats.averageRating ? "/ 5" : "",
-      gradient: "from-warning/20 to-warning/5",
-      iconBg: "from-warning to-warning/80",
     },
     {
       label: "Pending",
@@ -58,9 +50,6 @@ export function StatsCards({ stats }: { stats: DashboardStats }) {
               <p className="text-4xl font-bold text-foreground tracking-tight">
                 {card.value}
               </p>
-              {card.suffix && (
-                <span className="text-sm text-muted-foreground">{card.suffix}</span>
-              )}
             </div>
           </div>
         );

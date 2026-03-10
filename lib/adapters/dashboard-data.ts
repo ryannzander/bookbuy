@@ -147,9 +147,6 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
       createdAt: n.createdAt.toISOString(),
     }));
 
-    const averageRating = sellerSummary?.avgRating ?? 0;
-    const reviewCount = sellerSummary?.reviewsReceived.length ?? 0;
-
     const data: DashboardData = {
       user: {
         id: me.id,
@@ -166,15 +163,12 @@ export async function getDashboardData(): Promise<DashboardDataResult> {
         displayName: me.name ?? me.email,
         bio: null,
         avatarUrl: me.avatarUrl ?? null,
-        averageRating,
-        reviewCount,
         totalSales: analytics.booksSold,
         joinedAt: me.createdAt.toISOString(),
       },
       stats: {
         activeListings: analytics.activeListings,
         booksSold: analytics.booksSold,
-        averageRating: analytics.averageRating,
         pendingOrders: analytics.pendingOrders,
         unreadMessages: analytics.unreadMessages,
       },

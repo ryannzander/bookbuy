@@ -11,36 +11,25 @@ enum UserRole {
   ADMIN
 }
 
-enum UserPlan {
-  FREE
-  PRO
-}
-
 model User {
-  id                   String    @id
-  email                String    @unique
-  username             String?   @unique
-  name                 String?
-  avatarUrl            String?
-  schoolName           String?
-  verified             Boolean   @default(false)
-  responseRate         Int       @default(0)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  role                 UserRole  @default(USER)
-  onboarded            Boolean   @default(false)
-  lastActiveAt         DateTime?
-  plan                 UserPlan  @default(FREE)
-  stripeCustomerId     String?   @unique
-  stripeSubscriptionId String?
+  id           String    @id
+  email        String    @unique
+  username     String?   @unique
+  name         String?
+  avatarUrl    String?
+  schoolName   String?
+  verified     Boolean   @default(false)
+  responseRate Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  role         UserRole  @default(USER)
+  onboarded    Boolean   @default(false)
+  lastActiveAt DateTime?
 
   sellerProfile    SellerProfile?
   listings         Listing[]
   purchases        Purchase[]       @relation("Buyer")
   sales            Purchase[]       @relation("Seller")
-  reviewsGiven     Review[]         @relation("ReviewAuthor")
-  reviewsReceived  Review[]         @relation("ReviewReceiver")
-  bids             Bid[]
   notifications    Notification[]
   messageThreadsAsA MessageThread[] @relation("ThreadUserA")
   messageThreadsAsB MessageThread[] @relation("ThreadUserB")
@@ -66,7 +55,6 @@ model Listing {
   edition       String?
   price         Decimal       @db.Decimal(10, 2)
   type          ListingType
-  auctionEndsAt DateTime?
   status        ListingStatus @default(AVAILABLE)
   imageUrls     String?
   isFeatured    Boolean       @default(false)
@@ -77,7 +65,6 @@ model Listing {
 
   images         ListingImage[]
   purchases      Purchase[]
-  bids           Bid[]
   reports        Report[]
   messageThreads MessageThread[]
   wishlists      Wishlist[]
@@ -97,25 +84,13 @@ model ListingImage {
   @@index([listingId, position])
 }
 
-model Bid {
-  id        String   @id @default(cuid())
-  listingId String
-  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Decimal @db.Decimal(10, 2)
-  createdAt DateTime @default(now())
-}
-
 enum ListingType {
   FIXED
-  AUCTION
 }
 
 enum ListingStatus {
   AVAILABLE
   SOLD
-  AUCTION_ENDED
 }
 
 model Purchase {
@@ -133,7 +108,6 @@ model Purchase {
   meetupDate       DateTime?
   purchasedAt      DateTime       @default(now())
 
-  review Review?
   meetup Meetup?
 
   @@unique([listingId])
@@ -145,21 +119,6 @@ enum PurchaseStatus {
   PENDING
   COMPLETED
   CANCELLED
-}
-
-model Review {
-  id         String   @id @default(cuid())
-  purchaseId String
-  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
-  sellerId   String
-  seller     User     @relation("ReviewReceiver", fields: [sellerId], references: [id], onDelete: Cascade)
-  buyerId    String
-  buyer      User     @relation("ReviewAuthor", fields: [buyerId], references: [id], onDelete: Cascade)
-  rating     Int
-  comment    String?
-  createdAt  DateTime @default(now())
-
-  @@unique([purchaseId])
 }
 
 model Notification {
@@ -175,15 +134,13 @@ model Notification {
 }
 
 model SellerProfile {
-  userId         String   @id
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName    String
-  bio            String?
-  averageRating  Float    @default(0)
-  reviewCount    Int      @default(0)
-  totalSales     Int      @default(0)
-  joinedAt       DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String?
+  totalSales  Int      @default(0)
+  joinedAt    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model MessageThread {

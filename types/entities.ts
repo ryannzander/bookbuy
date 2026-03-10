@@ -14,8 +14,6 @@ export interface SellerProfile {
   displayName: string;
   bio: string | null;
   avatarUrl: string | null;
-  averageRating: number;
-  reviewCount: number;
   totalSales: number;
   joinedAt: string;
 }
@@ -64,16 +62,6 @@ export interface Order {
   meetupDate: string | null;
 }
 
-export interface Review {
-  id: string;
-  orderId: string;
-  reviewerId: string;
-  sellerId: string;
-  rating: number;
-  comment: string | null;
-  createdAt: string;
-}
-
 export type MeetupStatus = "SCHEDULED" | "PENDING" | "COMPLETED" | "CANCELLED";
 
 export interface Meetup {
@@ -90,7 +78,6 @@ export interface Meetup {
 export interface DashboardStats {
   activeListings: number;
   booksSold: number;
-  averageRating: number;
   pendingOrders: number;
   unreadMessages: number;
 }
