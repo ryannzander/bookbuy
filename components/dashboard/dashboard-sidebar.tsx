@@ -40,7 +40,7 @@ export function DashboardSidebar({
       <div className="p-6 border-b border-border">
         <Link href="/" className="text-xl font-bold text-foreground tracking-tight flex items-center gap-3">
           <span className="h-10 w-10 rounded-xl bg-foreground text-background inline-flex items-center justify-center"><BookOpen className="h-5 w-5" /></span>
-          <span>BuyBook</span>
+          <span>buybook</span>
         </Link>
       </div>
 
