@@ -40,7 +40,7 @@ export function DashboardSidebar({
           <span className="h-9 w-9 rounded-lg bg-primary/10 text-primary inline-flex items-center justify-center group-hover:bg-primary/20 transition-colors">
             <BookOpen className="h-5 w-5" />
           </span>
-          <span className="text-lg font-semibold text-foreground">BookBuy</span>
+          <span className="text-lg font-semibold text-foreground">buybook</span>
         </Link>
       </div>
 
